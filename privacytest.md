@@ -41,7 +41,8 @@ Steg 1: Hitta en singulär individ (uniquely discernible individual) i uppskattn
 - Om den syns på flera ställen ökar sannolikheten för att det är samma individ. 
 
 Steg 2: Identifiera ett antal domännamn under ett valt tidsintervall som går att koppla ihop med denna individ.
-- Finns det  individer som utmärker sig - gör en inferens - vilka domäner har de tittat på? 
+- Finns det  individer som utmärker sig - gör en inferens - vilka domäner har de tittat på?
+- Vilka domännamn mappar till de här weak-identiferarna? Över ett eller flera tidsintervall. 
 
 Steg 3 (separat test): Analysera huruvida dessa välkända domäner kan användas för att identifiera en verklig individ. 
 - Är det mönstret tillräckligt för att skapa en identifierande profil?  
@@ -51,4 +52,28 @@ Steg 3 (separat test): Analysera huruvida dessa välkända domäner kan använda
 Membership Inference Attacks on Machine Learning: A Survey
 
 [https://arxiv.org/abs/2103.07853](https://arxiv.org/abs/2103.07853)
+
+
+## TEST 2: Verifiera att det inte går att identifiera en individ genom att analysera frågemönster i TAPIR Core  
+
+### Hypotes: Det går att identifiera en individ genom att analysera frågemönster utifrån en weak-identifierare (pseudo-identifierare)
+
+### Scenario
+- <user> besöker [lokalacykelbutiken.se](http://lokalacykelbutiken.se/) -> besöker [extremaorganisationen.se](http://extremaorganisationen.se/) -> besöker [extremtidningen.se](http://extremtidningen.se/) -> besöker [gp.se](http://gp.se/) -> besöker [lokalahunddagiset.se](http://lokalahunddagiset.se/) -> besöker foretaget.se  -> osv -> inom 5 minuter.
+
+### Frågeställning
+- Utifrån en återkommande vana och en weak identifier, går det att hitta en specifik individ?
+- Dyker en weak-identifierare upp hos domäner med få klienter?
+- Bekräfta att aggregaten innehåller tillräckligt många DNS-frågor och klienter för att det inte ska gå att identifiera en individ?
+- Vilka domäner ska tittas på? Samma grupp av individer tittar på den. Gruppen av domännamn måste vara tillräckligt identifierande
+
+### Metod-idéer
+-  undersök om det går att hitta frågesekvenser i datasetet kopplat till en weak identifier, som kan användas för att göra en profil som kan härledas till en verklig individ
+-  verifiera att utifrån en sekvens av besök på well known domäner inte går att identifiera individuellt beteende. Visa med vilken sannolikhet det går att identifiera en individ utifrån dessa sekvenser.
+-  verifiera att de relativt unika domänerna som skulle kunna ge en profil, inte existerar i Well Known listan.
+-  verifiera att well known-listan bara innehåller domäner som har > 50 klienter på 1 timme.
+
+
+
+
 
