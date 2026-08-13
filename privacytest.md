@@ -31,7 +31,7 @@ Går det att hitta en singulär individ (unique discernible individual), eller e
 
 Kan detta mönster i sin tur identifiera en individ? (i ett efterföljande test). Ger det en profil som kan användas för att identifiera en verklig individ?
 
-**Metod-idéer:** 
+### Metod-idéer:
 
 Applicera en Membership Inference-algoritm på ett urval av dataset:et.
 
