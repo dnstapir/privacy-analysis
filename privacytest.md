@@ -54,7 +54,7 @@ Membership Inference Attacks on Machine Learning: A Survey
 [https://arxiv.org/abs/2103.07853](https://arxiv.org/abs/2103.07853)
 
 
-## TEST 2: Verifiera att det inte går att identifiera en individ genom att analysera frågemönster i TAPIR Core  
+## TEST 2: Verifiera att det inte går att identifiera en verklig individ genom att analysera frågemönster i TAPIR Core  
 
 ### Hypotes: Det går att identifiera en individ genom att analysera frågemönster utifrån en weak-identifierare (pseudo-identifierare)
 
