@@ -47,5 +47,8 @@ Steg 3 (separat test): Analysera huruvida dessa välkända domäner kan använda
 - Är det mönstret tillräckligt för att skapa en identifierande profil?  
 - Undersök logiken för vilka domäner som finns i wellknown, och är cutoff på 20 klienter tillräckligt? 
 
+### Teori
+Membership Inference Attacks on Machine Learning: A Survey
 
+[https://arxiv.org/abs/2103.07853](https://arxiv.org/abs/2103.07853)
 
