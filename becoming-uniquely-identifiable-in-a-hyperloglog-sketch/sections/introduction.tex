@@ -26,7 +26,8 @@ in theory, it should not.
 
 \begin{figure}[h]
     \includegraphics[scale=.5]{figures/hash.png}
-  \caption{TODO nicer image.}
+  \caption{A generic 16-bit hash split into $B$ ''head'' bits and
+    $C$ ''tail'' bits.}
   \label{fig:hash}
 \end{figure}
 
@@ -69,7 +70,7 @@ from a total of $Q$ hosts. We get that from:
 \begin{equation}
     p_N(n)
     = \binom{Q-1}{n-1}\left(\frac{1}{2^B}\right)^{n-1}\left(1-\frac{1}{2^B}\right)^{Q-n}
-    = \frac{\Gamma(Q)}{\Gamma(n)\Gamma(Q-n+1)}\left(\frac{1}{2^B}\right)^{n-1}\left(1-\frac{1}{2^B}\right)^{Q-n}
+    %= \frac{\Gamma(Q)}{\Gamma(n)\Gamma(Q-n+1)}\left(\frac{1}{2^B}\right)^{n-1}\left(1-\frac{1}{2^B}\right)^{Q-n}
     \label{eq:Ndist}
 \end{equation}
 
@@ -106,3 +107,31 @@ Where $p_L$ and $p_N$ are defined in (\ref{eq:Ldist}) and
 becomes uniquely identifiable in a system with $Q$ hosts, a bucket
 address width of $B$ and a hash size of $B+C$ having UD identifiers is
 given by (\ref{eq:mostleading}).
+
+\pagebreak
+\subsection{Quick Case Study}
+If we consider class B network ($Q=65536$) and a 64-bit hash, what is
+the probability that a host will be uniquely discernible?
+Figure~\ref{fig:ud} shows a graph for different values of $B$, the
+bucket address width. In addition to calculating the probability using
+(\ref{eq:mostleading}), we also present a simulated value. The
+simulated value was obtained by computing every address hash in a /16
+subnet and then programatically identifying which hashes would be
+uniquely identifiable given a specific address width $B$. This was done
+for 200 different subnets ranging from \texttt{10.0.0.0/16} to
+\texttt{10.199.0.0/16}. Figure~\ref{fig:ud} shows the arithmetic mean
+plus/minus the standard deviations computed from the simulations.
+The estimates agree well with the values that were calculated using
+(\ref{eq:mostleading}).
+
+In short, in a network with $Q=65536$ and using a HyperLogLog structure
+with 1024 buckets, roughly 1 percent of all hosts will be ''assigned''
+a unique identifier that allows their network activity to be tracked by
+someone who can inspect the HyperLogLog contents.
+
+\begin{figure}[h]
+    \includegraphics[scale=1]{figures/ud.png}
+  \caption{Probability for an individual host to be uniquely
+    discernible for a system of $Q=65536$ hosts and a 64-bit hash.}
+  \label{fig:ud}
+\end{figure}
