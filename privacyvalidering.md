@@ -37,6 +37,7 @@ En verklig IP-adress skulle lagras som en sträng eller ett 4/16 bytefält (?). 
 
 **Schema**
 
+```
 root
  |-- date: date (nullable = true)
  |-- creator: string (nullable = true)
@@ -90,6 +91,7 @@ root
  |-- v6clients_avg: double (nullable = true)
  |-- v4client_count_hll: integer (nullable = true)
  |-- v6client_count_hll: integer (nullable = true)
+```
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
