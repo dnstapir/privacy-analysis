@@ -25,13 +25,13 @@ IP-adresser är en av de primära och indirekta identifierarna i en DNS-förfrå
 
 Nedan är ett exempel på 5-minuters-aggregat. Todo: Ersätt med exempel på 1-minuters-aggregat
 
-![img/dataset_sample_pt1.png]
+![](img/dataset_sample_pt1.png)
 
-![img/dataset_sample_pt2.png]
+![](img/dataset_sample_pt2.png)
 
-![img/dataset_sample_pt3.png]
+![](img/dataset_sample_pt3.png)
 
-![img/dataset_sample_pt4.png]
+![](img/dataset_sample_pt4.png)
 
 En verklig IP-adress skulle lagras som en sträng eller ett 4/16 bytefält (?). De sträng-fält som finns är: creator, fqdn, r_fqdn. Samtliga är domännamn eller resolver-identifierare.
 
