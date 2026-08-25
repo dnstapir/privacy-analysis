@@ -63,7 +63,7 @@ Membership Inference Attacks on Machine Learning: A Survey
 
 ### Scenario
 
-- user besöker [lokalacykelbutiken.se](http://lokalacykelbutiken.se/) -> besöker [extremaorganisationen.se](http://extremaorganisationen.se/) -> besöker [extremtidningen.se](http://extremtidningen.se/) -> besöker [gp.se](http://gp.se/) -> besöker [lokalahunddagiset.se](http://lokalahunddagiset.se/) -> besöker foretaget.se  -> osv -> inom 5 minuter.
+- user besöker [minenskildafirma.se](http://lokalacykelbutiken.se/) -> besöker [katthultsfagelskadare.se](http://extremaorganisationen.se/) -> besöker [katthultsforskola.se](http://extremtidningen.se/) -> besöker [extrematidningen.se](http://gp.se/) -> inom 5 minuter.
 
 ### Frågeställning
 
