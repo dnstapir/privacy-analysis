@@ -1,0 +1,137 @@
+IP addresses are hashed and split into two parts as per Figure~\ref{fig:hash}.
+The blue part, we call it ''head'' and denote it $b$, is used as a
+bucket address. We update the contents in the bucket depending on
+properties of the red part, the ''tail'', which we denote $w$. The
+head has width $B$ and the tail has width $C$. For a 32-bit hash,
+$B+C=32$.
+
+Let $\rho(w)$ denote the number of leading zeroes in a bit sequence
+plus one. For example, $\rho(00100)=3$, $\rho(11000)=1$ and
+$\rho(00000)=6$.
+
+Bucket $M[b]$ is updated if the value we are trying to add, $\rho{w}$,
+is greater than its current contents.
+
+If an IP address hashes into a value with a leading number of zeros
+that is strictly greater than all other IP hashes for a given bucket,
+it becomes uniquely identifiable. In other words, it becomes possible
+to know that that particular address is present in a HyperLogLog sketch.
+
+For example, an IP address that hashes into $1010 1000 0000 0000$ will
+always dominate bucket $10101$ (assuming $B=5$). Similarly, an IP
+address $1010 1000 0000 0001$ is also prone to dominating the same
+bucket. Depending on what IP subnet(s) we are dealing with only the
+latter might be present, and will thus dominate the bucket even though
+in theory, it should not.
+
+\begin{figure}[h]
+    \includegraphics[scale=.5]{figures/hash.png}
+  \caption{A generic 16-bit hash split into $B$ ''head'' bits and
+    $C$ ''tail'' bits.}
+  \label{fig:hash}
+\end{figure}
+
+What is the probability that I am uniquely discernible (UD) in an IP
+network with $Q$ hosts? I am UD if I have strictly the greatest number
+of leading zeros in my hash tail for a given bucket.
+
+We begin by asking ourselves ''what is the probability that I have
+$\rho(w)=l$?''. The tails are assumed to be uniformly distributed bit
+sequences of length $C$. Then, the probability distribution is given by:
+
+\begin{equation}
+    p_L(l) =
+    \begin{cases}
+        \frac{1}{2^C}, & l=C+1 \\
+        \frac{1}{2^l}, & l\leq C \\
+        0, & \text{otherwise}
+    \end{cases}
+    \label{eq:Ldist}
+\end{equation}
+
+Next, we ask ourselves, ''given that there are a total of $N$ hashes
+that will attempt to update the same bucket as me and that my
+$\rho(w)=L$, what is the probability that I have strictly the greatest
+$L$ for that bucket?''. We get this from:
+
+\begin{equation}
+    p(\text{My $L$ is greatest | $N$}) =
+    \begin{cases}
+        1, & N=1 \\
+        \left(\sum_{i=1}^{L-1}p_L(i)\right)^{N-1}, & \text{otherwise}
+    \end{cases}
+    \label{eq:domgivenN}
+\end{equation}
+
+We would like to get rid of the conditioning on $N$. To do that, we
+need to know what is the probability of my bucket containing $n$ hosts
+from a total of $Q$ hosts. We get that from:
+
+\begin{equation}
+    p_N(n)
+    = \binom{Q-1}{n-1}\left(\frac{1}{2^B}\right)^{n-1}\left(1-\frac{1}{2^B}\right)^{Q-n}
+    %= \frac{\Gamma(Q)}{\Gamma(n)\Gamma(Q-n+1)}\left(\frac{1}{2^B}\right)^{n-1}\left(1-\frac{1}{2^B}\right)^{Q-n}
+    \label{eq:Ndist}
+\end{equation}
+
+We get rid of the conditioning by using (\ref{eq:Ndist}) to sum over
+$N$ in (\ref{eq:domgivenN}):
+
+\begin{equation}
+    p(\text{My $L$ is greatest})
+    = \sum_{j=1}^{Q}p_N(j)p(\text{My $L$ is greatest | $j$})
+    = \sum_{j=1}^{Q}p_N(j)\left(\sum_{i=1}^{L-1}p_L(i)\right)^{j-1}
+    \label{eq:domwithL}
+\end{equation}
+
+By recognising that (\ref{eq:domwithL}) contains another condition, namely
+one for $L$, we realize that:
+
+\begin{equation*}
+    p(\text{My $L$ is greatest})=p(\text{Most leading zeros in my bucket | $L$})
+\end{equation*}
+
+To get rid of this last conditioning on $L$, and thus obtain an expression
+for the probability that I have the most zeros in my bucket, we sum
+over the different values that $L$ can take:
+
+\begin{equation}
+    p(\text{Most leading zeros in my bucket})
+    = \sum_{k=1}^{C+1}p_L(k)p(\text{Most leading zeros in my bucket | $k$})
+    = \sum_{k=1}^{C+1}p_L(k)\sum_{j=1}^{Q}p_N(j)\left(\sum_{i=1}^{k-1}p_L(i)\right)^{j-1}
+    \label{eq:mostleading}
+\end{equation}
+
+Where $p_L$ and $p_N$ are defined in (\ref{eq:Ldist}) and
+(\ref{eq:Ndist}), respectively. Thus, the probability that an IP address
+becomes uniquely identifiable in a system with $Q$ hosts, a bucket
+address width of $B$ and a hash size of $B+C$ having UD identifiers is
+given by (\ref{eq:mostleading}).
+
+\pagebreak
+\subsection{Quick Case Study}
+If we consider class B network ($Q=65536$) and a 64-bit hash, what is
+the probability that a host will be uniquely discernible?
+Figure~\ref{fig:ud} shows a graph for different values of $B$, the
+bucket address width. In addition to calculating the probability using
+(\ref{eq:mostleading}), we also present a simulated value. The
+simulated value was obtained by computing every address hash in a /16
+subnet and then programatically identifying which hashes would be
+uniquely identifiable given a specific address width $B$. This was done
+for 200 different subnets ranging from \texttt{10.0.0.0/16} to
+\texttt{10.199.0.0/16}. Figure~\ref{fig:ud} shows the arithmetic mean
+plus/minus the standard deviations computed from the simulations.
+The estimates agree well with the values that were calculated using
+(\ref{eq:mostleading}).
+
+In short, in a network with $Q=65536$ and using a HyperLogLog structure
+with 1024 buckets, roughly 1 percent of all hosts will be ''assigned''
+a unique identifier that allows their network activity to be tracked by
+someone who can inspect the HyperLogLog contents.
+
+\begin{figure}[h]
+    \includegraphics[scale=1]{figures/ud.png}
+  \caption{Probability for an individual host to be uniquely
+    discernible for a system of $Q=65536$ hosts and a 64-bit hash.}
+  \label{fig:ud}
+\end{figure}
