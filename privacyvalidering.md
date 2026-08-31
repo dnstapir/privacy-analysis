@@ -28,7 +28,7 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 - Utdrag dataset Core (5-min aggregat)
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
-- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
+- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  [sample](samples/20260818_081501_competent-albattani.test.dnstapir.se_6a8414854a4e347a7067c179.parquet)
 
 ### Schema aggregates
@@ -164,7 +164,7 @@ Tillgång till datalagret fås vid förfrågan och under förutsättning att rä
 
 ### Verifiera att alla poster endast har 0 som sekundvärde
 
-- Notebook finns tillgänlig publikt med sample parquet-fil  [github.com/dnstapir/...](github.com/dnstapir/...)
+- Notebook finns tillgänlig publikt med sample parquet-fil  [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
 - Utökas med fler verifieringar vid behov.
 
 ![img8](img/8.png)
