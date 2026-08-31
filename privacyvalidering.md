@@ -91,13 +91,13 @@ root
 
 Exempel på 5-minuters-aggregat.
 
-![[img/1.png]]
+![img1](img/1.png)
 
-![[img/2.png]]
+![img1](img/2.png)
 
-![[img/3.png]]
+![img1](img/3.png)
 
-![[img/4.png]]
+![img1](img/4.png)
 
 En verklig IP-adress lagras som en sträng eller ett BINARY(4) för IPv4, BINARY(16) för IPv6 (?). 32 bytefält (?).
 Fråga: Behöver check göras i HLL-fältet?
@@ -106,7 +106,7 @@ Fråga: Behöver check göras i HLL-fältet?
 
 Fråga: Hur stort sample behöver det vara?
 
-![[img/5.png]]
+![img5](img/5.png)
 
 ipv6_pattern utökas vid behov, exakt alla ipv6-format täcks inte i detta exempel.
 
