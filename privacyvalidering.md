@@ -28,7 +28,7 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 - Utdrag dataset Core (5-min aggregat)
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
-- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
+- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  [sample](samples/20260818_081501_competent-albattani.test.dnstapir.se_6a8414854a4e347a7067c179.parquet)
 
 ### Schema aggregates
@@ -91,13 +91,13 @@ root
 
 Exempel på 5-minuters-aggregat.
 
-![[img/1.png]]
+![img1](img/1.png)
 
-![[img/2.png]]
+![img1](img/2.png)
 
-![[img/3.png]]
+![img1](img/3.png)
 
-![[img/4.png]]
+![img1](img/4.png)
 
 En verklig IP-adress lagras som en sträng eller ett BINARY(4) för IPv4, BINARY(16) för IPv6 (?). 32 bytefält (?).
 Fråga: Behöver check göras i HLL-fältet?
@@ -106,7 +106,7 @@ Fråga: Behöver check göras i HLL-fältet?
 
 Fråga: Hur stort sample behöver det vara?
 
-![[img/5.png]]
+![img5](img/5.png)
 
 ipv6_pattern utökas vid behov, exakt alla ipv6-format täcks inte i detta exempel.
 
@@ -127,7 +127,7 @@ ipv6_pattern = (
 ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 ```
 
-![[img/6.png]]
+![img6](img/6.png)
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
@@ -156,18 +156,18 @@ Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet tog
 - Förslag: Öppen notebook. Ta fram en sample-parquet, använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample via Github Pages.
 
 **Utdrag 1-min aggregat**
-Notebook finns tillgänlig publikt med sample parquet-fil [github.com/dnstapir/...](github.com/dnstapir/...)
+Notebook finns tillgänlig publikt med sample parquet-fil [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
 Fler samples fås vid förfrågan
 Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
-![[img/7.png]]
+![img7](img/7.png)
 
 ### Verifiera att alla poster endast har 0 som sekundvärde
 
-- Notebook finns tillgänlig publikt med sample parquet-fil  [github.com/dnstapir/...](github.com/dnstapir/...)
+- Notebook finns tillgänlig publikt med sample parquet-fil  [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
 - Utökas med fler verifieringar vid behov.
 
-![[img/8.png]]
+![img8](img/8.png)
 
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events som publiceras som observation till TAPIR Core
 
@@ -194,7 +194,7 @@ Förutsätter att de domänerna finns i wellknown +  otur med den hashade adress
 
 För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.
 
-Well Known : Micke publicerar scripten som genererar well known.
+Todo: Script som genererar well known-filen publiceras 
 
 Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
 
@@ -224,6 +224,3 @@ Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggre
 - Går det att se ett mönster från den enskilda entiteten
 - Beskriv: Hur göra för att hitta en unikt identifierbar frågeställare i HLL-sketch. Ta fram ett frågemönster för denna avsändar-identitet (= Membership inference attack?).
 - Är det tillräckligt ovanligt för att anses som osannolikt?
-
-
-[def]: samples/ViewParquet.ipynb
