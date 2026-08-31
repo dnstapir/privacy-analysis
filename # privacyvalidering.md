@@ -1,7 +1,6 @@
 # Grundläggande validering av det aggregerade datasetet i TAPIR Core
 
---DETTA ÄR ETT UTKAST. WORK IN PROGRESS--
-
+---DETTA ÄR ETT UTKAST. WORK IN PROGRESS---
 ## Bakgrund
 
 - GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym.
@@ -9,39 +8,27 @@
 - Anonymiseringen ska vara irreversibel.
 - Det finns tre huvudrisker för avidentifiering: särskiljbarhet, länkbarhet samt inferens
 
-DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination sekvensbrytning, anonymiseringstekniker och successiv aggregering.
+DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
 
 Uppskattning av unika domän-förfrågningar görs med algoritmen HyperLogLog (HLL) utan att lagra hela datasetet
 
 ## Påstående: Explicita IP-adresser existerar inte i TAPIR Core dataset
 
 IP-adresser är en av de primära och indirekta identifierarna i en DNS-förfrågan
+Inga explicita IP-adresser existerar i TAPIR Core dataset, med undantag för sådana som kan förekomma i domännamn vilket är utanför TAPIRs kontroll. 
+
+Exempel på sådana domännamn och tjänster som använder dessa är: 
+4.4.8.8.in-addr.arpa
+4.3.3.7.0.7.3.0.e.2.a.8.0.0.0.0.0.0.0.0.3.a.5.8.8.b.d.0.1.0.0.2.ip6.arpa
 
 **Validering**:
 
 - Exempel på dataschemat inklusive datatyper
-- Utdrag dataset Core (1-min aggregat, parquet-format)
-- Utdraget som CSV (exkl HLL) för egen analys
-- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat
-- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress i strängfält IP-adress (IPv4, IPv6)
-
-**Schema**
-
-Ersätt med parquet-schema
-
-
-
-Nedan är ett exempel på 5-minuters-aggregat. Todo: Ersätt med exempel på 1-minuters-aggregat
-
-![](img/dataset_sample_pt1.png)
-
-![](img/dataset_sample_pt2.png)
-
-![](img/dataset_sample_pt3.png)
-
-![](img/dataset_sample_pt4.png)
-
-En verklig IP-adress skulle lagras som en sträng eller ett 32 bytefält (?). De sträng-fält som finns är: creator, fqdn, r_fqdn. Samtliga är domännamn eller resolver-identifierare.
+- Utdrag dataset Core (5-min aggregat)
+- Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
+- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  github.com/dnstapir/...
+- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress i strängfält IP-adress (IPv4, IPv6) github.com/dnstapir/...
+- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  github.com/dnstapir/...
 
 **Schema aggregates**
 
@@ -100,8 +87,18 @@ root
  |-- v4client_count_hll: integer (nullable = true)
  |-- v6client_count_hll: integer (nullable = true)
 ```
+Exempel på 5-minuters-aggregat. 
 
-Script är tillgänligt på: github.com..... Data-sample fås vid förfrågan i parquet-format, alternativt  tillgång till den faktiska datakällan under förutsättning att behörighet finns. 
+![[Pasted image 20260831095412.png]]
+
+![[Pasted image 20260831095455.png]]
+
+![[Pasted image 20260831095550.png]]
+
+![[Pasted image 20260831095614.png]]
+
+En verklig IP-adress lagras som en sträng eller ett BINARY(4) för IPv4, BINARY(16) för IPv6 (?). 32 bytefält (?). 
+Fråga: Behöver check göras i HLL-fältet?
 
 **Verifiering av att inga explicita IP-adresser finns i TAPIR Core**
 
@@ -109,7 +106,24 @@ Fråga: Hur stort sample behöver det vara?
 
 ![[Pasted image 20260826151631.png]]
 
-![[Pasted image 20260826152118.png]]
+ipv6_pattern utökas vid behov, exakt alla ipv6-format täcks inte i detta exempel.
+```
+ipv6_pattern = (
+    r"([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|"
+    r"([0-9a-fA-F]{1,4}:){1,7}:|"
+    r"([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|"
+    r"([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|"
+    r"([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|"
+    r"([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|"
+    r"([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|"
+    r"[0-9a-fA-F]{1,4}:(:[0-9a-fA-F]{1,4}){1,6}|"
+    r":(:[0-9a-fA-F]{1,4}){1,7}|"
+    r"::"
+)
+
+ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
+```
+![[Pasted image 20260831101705.png]]
 
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
