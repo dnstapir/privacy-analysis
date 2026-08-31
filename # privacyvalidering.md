@@ -91,13 +91,13 @@ root
 
 Exempel på 5-minuters-aggregat.
 
-![[Pasted image 20260831095412.png]]
+![[img/1.png]]
 
-![[Pasted image 20260831095455.png]]
+![[img/2.png]]
 
-![[Pasted image 20260831095550.png]]
+![[img/3.png]]
 
-![[Pasted image 20260831095614.png]]
+![[img/4.png]]
 
 En verklig IP-adress lagras som en sträng eller ett BINARY(4) för IPv4, BINARY(16) för IPv6 (?). 32 bytefält (?).
 Fråga: Behöver check göras i HLL-fältet?
@@ -106,7 +106,7 @@ Fråga: Behöver check göras i HLL-fältet?
 
 Fråga: Hur stort sample behöver det vara?
 
-![[Pasted image 20260826151631.png]]
+![[img/5.png]]
 
 ipv6_pattern utökas vid behov, exakt alla ipv6-format täcks inte i detta exempel.
 
@@ -127,7 +127,7 @@ ipv6_pattern = (
 ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 ```
 
-![[Pasted image 20260831101705.png]]
+![[img/6.png]]
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
@@ -160,14 +160,14 @@ Notebook finns tillgänlig publikt med sample parquet-fil [github.com/dnstapir/.
 Fler samples fås vid förfrågan
 Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
-![[Pasted image 20260831124430.png]]
+![[img/7.png]]
 
 ### Verifiera att alla poster endast har 0 som sekundvärde
 
 - Notebook finns tillgänlig publikt med sample parquet-fil  [github.com/dnstapir/...](github.com/dnstapir/...)
 - Utökas med fler verifieringar vid behov.
 
-![[Pasted image 20260831124630.png]]
+![[img/8.png]]
 
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events som publiceras som observation till TAPIR Core
 
