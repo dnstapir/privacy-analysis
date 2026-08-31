@@ -194,7 +194,7 @@ Förutsätter att de domänerna finns i wellknown +  otur med den hashade adress
 
 För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.
 
-Well Known : Micke publicerar scripten som genererar well known.
+Todo: Script som genererar well known-filen publiceras 
 
 Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
 
