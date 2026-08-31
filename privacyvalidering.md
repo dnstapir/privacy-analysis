@@ -127,7 +127,7 @@ ipv6_pattern = (
 ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 ```
 
-![[img/6.png]]
+![img6](img/6.png)
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
@@ -156,18 +156,18 @@ Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet tog
 - Förslag: Öppen notebook. Ta fram en sample-parquet, använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample via Github Pages.
 
 **Utdrag 1-min aggregat**
-Notebook finns tillgänlig publikt med sample parquet-fil [github.com/dnstapir/...](github.com/dnstapir/...)
+Notebook finns tillgänlig publikt med sample parquet-fil [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
 Fler samples fås vid förfrågan
 Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
-![[img/7.png]]
+![img7](img/7.png)
 
 ### Verifiera att alla poster endast har 0 som sekundvärde
 
 - Notebook finns tillgänlig publikt med sample parquet-fil  [github.com/dnstapir/...](github.com/dnstapir/...)
 - Utökas med fler verifieringar vid behov.
 
-![[img/8.png]]
+![img8](img/8.png)
 
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events som publiceras som observation till TAPIR Core
 
@@ -224,6 +224,3 @@ Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggre
 - Går det att se ett mönster från den enskilda entiteten
 - Beskriv: Hur göra för att hitta en unikt identifierbar frågeställare i HLL-sketch. Ta fram ett frågemönster för denna avsändar-identitet (= Membership inference attack?).
 - Är det tillräckligt ovanligt för att anses som osannolikt?
-
-
-[def]: samples/ViewParquet.ipynb
