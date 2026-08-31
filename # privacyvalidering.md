@@ -141,78 +141,79 @@ Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de po
 
 I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
 
-För att en exakt tidstämpel ska vara relevant behövs: datum, timme, minut, sekund
-Finns sekund-tidsstämpel (i metadatat, när aggregatet togs emot, när intervallet startar)
+För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: källa?)
+
+Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet togs emot av TAPIR Core, vilket visar när minut-intervallet startar. 
 
 **Validering**
-
 - Exempel på dataschemat inklusive datatyper (se ovan)
-- Utdrag dataset Core (1-min aggregat, parquet-format) (se ovan)
-- Utdraget som CSV (exkl HLL) för egen analys
-- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat
-- Förslag: Öppen notebook. Ta fram en sample-parquet, sätt upp webserver på Github pages och använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample.
+- Utdrag dataset Core (1-min aggregat, parquet-format) 
+- Utdraget av 1-min-aggregat som CSV (exkl HLL) för egen analys, vid förfrågan
+- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat 
+- Förslag: Öppen notebook. Ta fram en sample-parquet, använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample via Github Pages.
 
 
-## Påstående: Unikt identifierbara domäner, förfrågningar, existerar inte i aggregat som publiceras till TAPIR Core. Unika domäner kan existera som event
+**Utdrag 1-min aggregat**
+Notebook finns tillgänlig publikt med sample parquet-fil github.com/dnstapir/... 
+Fler samples fås vid förfrågan
+Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
-Exempel, case:  nisseikatthultsdeviceid.bigtechgiant.com. (tidsstämpel när eventen skickades)
-lagras i key-value-store men utan mer information
+![[Pasted image 20260831124430.png]]
 
-kodsnutt när EDM publicerar event, länk till koden.
+**Verifiera att alla poster endast har 0 som sekundvärde**
+- Notebook finns tillgänlig publikt med sample parquet-fil  github.com/dnstapir/... 
+- Utökas med fler verifieringar vid behov.
 
-Hur visa att det inte finns unikt identifierbara domäner i aggregaten? 
-1 person som frågar efter den regelbundet..
+![[Pasted image 20260831124630.png]]
 
-Alla domäner finns publik kunskap om. 
-Well Known : Micke publicerar scripten som genererar well known 
 
-För att en domän ska finnas i aggregat behöver den finnas i well known-listan. Baserad på openpagerank och liknande publika källor. Även om en unikt identiferbar domän finns, går det inte att identifera individ. Unikt utseende på hll-sketchen plus unikt identiferbar domän
+## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events som publiceras som observation till TAPIR Core. 
 
-Titta i well-known-filen
-Operatörer kan använda vilken wellknown de vill, inkl alla domäner i världen.
-Visa var well-known-filen finns.
+Unika domäner kan existera som events, som en observation av ny domän. Dessa events lagras i NATS/key-valuestore utan annan meta-data än tidsstämpel när eventet skickades (är den fördröjd?)...  EDM skickar events men ej exakt, fördröjd. 
 
-Förslag på lösning om det är ett problem: Endast domäner med x antal förfrågningar kan existera i wellknown.
+to be continued.
 
-Exempel: En individ har ställt frågan, kan inte korrelera med någon annan.
+Exempel, case:  minunikaidentifierare.example.com. lagras i key-value-store med tidsstämpel när eventet skickades. 
 
-Unika domäner via events: kalletuta.com  - tar vi emot tidsstämpel? EDM skickar events men ej exakt, fördröjd. tidsstämpel Validering: visa kod. Domänen lagras i NATS/store.
+Exempel: nissatuta.com - sparas en gång att den har setts av en ny creator. vilken creator, tidsstämpel när eventet skickades
 
-nissatuta.com - sparas en gång att den har setts av en ny creator. vilken creator, tidsstämpel (?)
-
-Visa sample från NATS.
-
+**Validering**
+- Koden för hur EDM publicerar events finns här: github.com/dnstapir/edm...  
+- Eventuellt: Visa sample från NATS key-value store.
 ## Påstående: Unikt identifierbara dns-fråge-mönster i TAPIR Core aggregat är extremt osannolikt
 
-**Förändringar som planeras, säkerhetsåtgärd:** 
+---- WORK IN PROGRESS ---- 
+
+Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna vara t.ex ett hushåll i HLL-sketchen? Och utifrån den avsändaridentiteten följa ett mönster t.ex:  internetstiftelsen.se -> gnestafågelskådare -> gnestalillaförskola -> skobesgnesta?
+
+Förutsätter att de domänerna finns i wellknown +  otur med den hashade adressen, HLL-sketchen
+
+För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: github.com/dnstapir/...   Edge-operatören kan ersätta med valfri.
+
+Well Known : Micke publicerar scripten som genererar well known. 
+
+Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
+
+**Förändringar som planeras, säkerhetsåtgärd så att det inte ska kunna ske:** 
 Dela upp Well Known Domains i: 
-- Well well known. 
-- Less well known. Annan metodik för HLL-sketchen, går inte jämföra kardinalitet mellan domäner. IP+domänen
+- Well well known.  (google.com, apple.com osv)
+- Less well known. Annan metodik för HLL-sketchen, går då inte jämföra kardinalitet mellan domäner. HLL-sketchen genereras utifrån IP-adress+domänen
+
+Förslag på ytterligare säkerhetsåtgärder om det skulle anses nödvändigt: 
+- Endast domäner med x antal förfrågningar kan existera i wellknown.
 
 Varför är det viktigt? 
 
 Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggregaten, kommer inte kunna lägga ihop 1 timme och 5 min.
 
 **Validera**
-Genomför en membership inference attack (kostar)
-Micke visar om en PoC, 9/9, spela in
+- Genomför en membership inference attack (kostar)
+- M visar en PoC på en membership inference attack, 9/9, spela in
+- Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher  (Leon dokument … ) 
+	- Hur stor får sannolikheten vara för ett unikt fingeravtryck? Räcker det med att det är ett ovanligt fingeravtryck?
+	- Är beräkningarna korrekta, återspeglar det verkligheten? 
+	- Beräkna utifrån hur många kunder en ISP kan ha i sitt nät? x procent kan vara unika … i tal. Är det acceptabel nivå? 
+	- Går det att se ett mönster från den enskilda entiteten
+	- Beskriv: Hur göra för att hitta en unikt identifierbar frågeställare i HLL-sketch. Ta fram ett frågemönster för denna avsändar-identitet (= Membership inference attack?).
+	- Är det tillräckligt ovanligt för att anses som osannolikt?
 
-
-
-
-Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna vara t.ex ett hushåll i HLL-sketchen? Och utifrån den avsändaridentiteten följa ett mönster t.ex:  internetstiftelsen.se -> gnestafågelskådare -> gnestalillaförskola -> skobesgnesta?
-
-Förutsätter att de domänerna finns i wellknown +  otur med den hashade adressen?
-
-Vad är sannolikheten att ens identifiera en enskild “avsändaridentitet”?  (Leon dokument … ) Hur stor får sannolikheten vara för ett unikt fingeravtryck? Räcker det med att det är ett ovanligt fingeravtryck?
-Är beräkningarna korrekta, återspeglar det verkligheten? 
-Beräkna utifrån hur många kunder en ISP kan ha i sitt nät? x procent kan vara unika … i tal. Är det acceptabel nivå? 
-Går det att se ett mönster från den enskilda entiteten
-
-Undersök
-Hur göra för att hitta en unikt identifierbar frågeställare i HLL-sketch?
-Ta fram ett frågemönster för denna avsändar-identitet
-Är det tillräckligt ovanligt för att anses som osannolikt?
-
-Om det är ett problem
-Om det är ett problem så är en föreslagen lösning: kryptera ip + domännamn = HLL-hash  
