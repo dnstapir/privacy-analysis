@@ -27,7 +27,7 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 - Exempel på dataschemat inklusive datatyper
 - Utdrag dataset Core (5-min aggregat)
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
-- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [github.com/dnstapir/...](github.com/dnstapir/...)
+- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress i strängfält IP-adress (IPv4, IPv6) [github.com/dnstapir/...](github.com/dnstapir/...)
 - Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  [github.com/dnstapir/...](github.com/dnstapir/...)
 
