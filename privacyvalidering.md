@@ -1,4 +1,4 @@
-# Grundläggande validering av det aggregerade datasetet i TAPIR Core
+# Validering av personlig integritet i TAPIR Core dataset
 
 ---DETTA ÄR ETT UTKAST. WORK IN PROGRESS---
 
@@ -143,7 +143,7 @@ Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de po
 
 I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
 
-För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: källa?)
+För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: referens?)
 
 Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet togs emot av TAPIR Core, vilket visar när minut-intervallet startar.
 
@@ -169,9 +169,9 @@ Tillgång till datalagret fås vid förfrågan och under förutsättning att rä
 
 ![img8](img/8.png)
 
-## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events som publiceras som observation till TAPIR Core
+## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events
 
-Unika domäner kan existera som events, som en observation av ny domän. Dessa events lagras i NATS/key-valuestore utan annan meta-data än tidsstämpel när eventet skickades (är den fördröjd?)...  EDM skickar events men ej exakt, fördröjd.
+Unika domäner kan existera som events, publiceras till TAPIR Core, och genererar en observation av ny domän. Dessa events lagras i NATS/key-valuestore utan annan meta-data än tidsstämpel när eventet skickades (är den fördröjd?)...  EDM skickar events men ej exakt, fördröjd.
 
 to be continued.
 
@@ -194,7 +194,7 @@ Förutsätter att de domänerna finns i wellknown +  otur med den hashade adress
 
 För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.
 
-Todo: Script som genererar well known-filen publiceras 
+Todo: Script som genererar well known-filen publiceras
 
 Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
 
@@ -216,7 +216,16 @@ Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggre
 
 - Genomför en membership inference attack (kostar)
 - M visar en PoC på en membership inference attack, 9/9, spela in
-- Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher  (Leon dokument … )
+- Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher
+
+**Sannolikhet för att identifiera en ensild användaridentitet**
+
+Sannolikheten har beräknats enligt... och är ...
+
+Simulering och beräkningar finns här:
+[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
+
+Frågor:
 
 - Hur stor får sannolikheten vara för ett unikt fingeravtryck? Räcker det med att det är ett ovanligt fingeravtryck?
 - Är beräkningarna korrekta, återspeglar det verkligheten?
