@@ -226,6 +226,7 @@ Simulering och beräkningar finns här:
 [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
 
 Frågor:
+
 - Hur stor får sannolikheten vara för ett unikt fingeravtryck? Räcker det med att det är ett ovanligt fingeravtryck?
 - Är beräkningarna korrekta, återspeglar det verkligheten?
 - Beräkna utifrån hur många kunder en ISP kan ha i sitt nät? x procent kan vara unika … i tal. Är det acceptabel nivå?
