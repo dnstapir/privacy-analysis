@@ -3,7 +3,7 @@ This document will summarize the work related to analysing the privacy
 of DNS TAPIR.
 
 Documentation is a mix of English and Swedish. Swedish in order for legal audits.
-Will be translated when stable document.
+Will be translated when document is confirmed version.
 
 
 # Useful Links
