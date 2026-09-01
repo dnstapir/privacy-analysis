@@ -216,7 +216,7 @@ Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggre
 
 - Genomför en membership inference attack (kostar)
 - M visar en PoC på en membership inference attack, 9/9, spela in
-- Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher 
+- Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher
 
 **Sannolikhet för att identifiera en ensild användaridentitet**
 
