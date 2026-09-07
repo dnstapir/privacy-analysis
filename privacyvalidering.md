@@ -25,11 +25,12 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 **Validering**:
 
 - Exempel på dataschemat inklusive datatyper
-- Utdrag dataset Core (5-min aggregat)
+- Utdrag dataset Core (Aggregat 1-min, aggregat 5-min aggregat)
+- [Samples av parquet-filer (1-minutersaggregat)](samples/).
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
-- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  [sample](samples/20260818_081501_competent-albattani.test.dnstapir.se_6a8414854a4e347a7067c179.parquet)
+- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns)
 
 ### Schema aggregates
 
@@ -131,34 +132,31 @@ ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
-Implementering pågår av kryptering med CryptoPAN före hashning
-IP-adresser krypteras innan de hashas.
+För att inga implicita IP-adresser ska gå att identifiera i HLL-sketch så Implementeras kryptering av IP-adress med CryptoPAN före hashning.
 
 **Validering**
 ...
 
 ## Påstående: Exakta tidsstämplar existerar inte i TAPIR Core dataset
 
-Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan loggdata för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller.
-
-I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
+Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan logg-data för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller.
 
 För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: referens?)
+
+I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
 
 Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet togs emot av TAPIR Core, vilket visar när minut-intervallet startar.
 
 ### Validering
 
 - Exempel på dataschemat inklusive datatyper (se ovan)
-- Utdrag dataset Core (1-min aggregat, parquet-format) 
+- Utdrag dataset Core (1-min aggregat, parquet-format) [samples](samples/)
 - Utdraget av 1-min-aggregat som CSV (exkl HLL) för egen analys, vid förfrågan
-- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat
-- Förslag: Öppen notebook. Ta fram en sample-parquet, använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample via Github Pages.
+- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
+- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
+- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns) eller egen installation.
 
 **Utdrag 1-min aggregat**
-Notebook finns tillgänlig publikt med sample parquet-fil [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
-Fler samples fås vid förfrågan
-Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
 ![img7](img/7.png)
 
@@ -171,18 +169,21 @@ Tillgång till datalagret fås vid förfrågan och under förutsättning att rä
 
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events
 
-Unika domäner kan existera som events, publiceras till TAPIR Core, och genererar en observation av ny domän. Dessa events lagras i NATS/key-valuestore utan annan meta-data än tidsstämpel när eventet skickades (är den fördröjd?)...  EDM skickar events men ej exakt, fördröjd.
+Unika domäner, publiceras till TAPIR Core, och genererar en observation av ny domän. 
 
-to be continued.
+Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.someonesid.example.com
 
-Exempel, case:  minunikaidentifierare.example.com. lagras i key-value-store med tidsstämpel när eventet skickades.
+Dessa events lagras i TAPIR Core Feature Store: 
+- domännamnet
+- Vilken creator (TAPIR Edge) som observerade domänen.
+- Metadata: tidsstämpel när eventet publicerades (inte när DNS-uppslaget gjordes).  
 
-Exempel: nissatuta.com - sparas en gång att den har setts av en ny creator. vilken creator, tidsstämpel när eventet skickades
-
+Dessa lagras alltså inte i 1-minuters-aggregaten (parquet-filerna), och existerar inte i datasetet.
 ### Validering
 
 - Koden för hur EDM publicerar events finns här: [github.com/dnstapir/edm...](github.com/dnstapir/edm...)  
 - Eventuellt: Visa sample från NATS key-value store.
+- Eventuellt: Kod-exempel för att leta efter ett eller många kända unika domännamn i TAPIR Core Dataset
 
 ## Påstående: Unikt identifierbara dns-fråge-mönster i TAPIR Core aggregat är extremt osannolikt
 
@@ -192,20 +193,18 @@ Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna v
 
 Förutsätter att de domänerna finns i wellknown +  otur med den hashade adressen, HLL-sketchen
 
-För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.
+För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  
+(Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.)
 
-Todo: Script som genererar well known-filen publiceras
+Även om en unikt identitiferbar domän finns i Core dataset, så går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
 
-Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
-
-**Förändringar som planeras, säkerhetsåtgärd så att det inte ska kunna ske:**
+**Förändringar som planeras, ytterligare säkerhetsåtgärd så att det inte ska kunna ske:**
 Dela upp Well Known Domains i:
 
 - Well well known.  (google.com, apple.com osv)
 - Less well known. Annan metodik för HLL-sketchen, går då inte jämföra kardinalitet mellan domäner. HLL-sketchen genereras utifrån IP-adress+domänen
 
 Förslag på ytterligare säkerhetsåtgärder om det skulle anses nödvändigt: 
-
 - Endast domäner med x antal förfrågningar kan existera i wellknown.
 
 Varför är det viktigt?
