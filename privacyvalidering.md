@@ -25,11 +25,12 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 **Validering**:
 
 - Exempel på dataschemat inklusive datatyper
-- Utdrag dataset Core (5-min aggregat)
+- Utdrag dataset Core (Aggregat 1-min, aggregat 5-min aggregat)
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
-- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns), eller mot ett eller flera samples av parquet-filer (1-minutersaggregat). Sample:  [sample](samples/20260818_081501_competent-albattani.test.dnstapir.se_6a8414854a4e347a7067c179.parquet)
+- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns)
+- [Samples av parquet-filer (1-minutersaggregat)](samples/).
 
 ### Schema aggregates
 
