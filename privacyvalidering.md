@@ -132,34 +132,31 @@ ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
-Implementering pågår av kryptering med CryptoPAN före hashning
-IP-adresser krypteras innan de hashas.
+För att inga implicita IP-adresser ska gå att identifiera i HLL-sketch så Implementeras kryptering av IP-adress med CryptoPAN före hashning.
 
 **Validering**
 ...
 
 ## Påstående: Exakta tidsstämplar existerar inte i TAPIR Core dataset
 
-Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan loggdata för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller.
-
-I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
+Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan logg-data för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller.
 
 För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: referens?)
+
+I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
 
 Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet togs emot av TAPIR Core, vilket visar när minut-intervallet startar.
 
 ### Validering
 
 - Exempel på dataschemat inklusive datatyper (se ovan)
-- Utdrag dataset Core (1-min aggregat, parquet-format) 
+- Utdrag dataset Core (1-min aggregat, parquet-format) [samples](samples/)
 - Utdraget av 1-min-aggregat som CSV (exkl HLL) för egen analys, vid förfrågan
-- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat
-- Förslag: Öppen notebook. Ta fram en sample-parquet, använd ett enkelt verktyg, exempelvis Hyparquet för att visa schemat och datasample via Github Pages.
+- Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
+- Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
+- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns) eller egen installation.
 
 **Utdrag 1-min aggregat**
-Notebook finns tillgänlig publikt med sample parquet-fil [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
-Fler samples fås vid förfrågan
-Tillgång till datalagret fås vid förfrågan och under förutsättning att rätt behörigheter finns
 
 ![img7](img/7.png)
 
