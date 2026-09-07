@@ -169,14 +169,16 @@ Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet tog
 
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events
 
-Unika domäner kan existera som events, publiceras till TAPIR Core, och genererar en observation av ny domän. Dessa events lagras i NATS/key-valuestore utan annan meta-data än tidsstämpel när eventet skickades (är den fördröjd?)...  EDM skickar events men ej exakt, fördröjd.
+Unika domäner, publiceras till TAPIR Core, och genererar en observation av ny domän. 
 
-to be continued.
+Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.someonesid.example.com
 
-Exempel, case:  minunikaidentifierare.example.com. lagras i key-value-store med tidsstämpel när eventet skickades.
+Dessa events lagras i TAPIR Core Feature Store: 
+- domännamnet
+- Vilken creator (TAPIR Edge) som observerade domänen.
+- Metadata: tidsstämpel när eventet publicerades (inte när DNS-uppslaget gjordes).  
 
-Exempel: nissatuta.com - sparas en gång att den har setts av en ny creator. vilken creator, tidsstämpel när eventet skickades
-
+Dessa lagras alltså inte i 1-minuters-aggregaten (parquet-filerna), och existerar inte i datasetet.
 ### Validering
 
 - Koden för hur EDM publicerar events finns här: [github.com/dnstapir/edm...](github.com/dnstapir/edm...)  
