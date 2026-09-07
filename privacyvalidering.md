@@ -26,11 +26,11 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 
 - Exempel på dataschemat inklusive datatyper
 - Utdrag dataset Core (Aggregat 1-min, aggregat 5-min aggregat)
+- [Samples av parquet-filer (1-minutersaggregat)](samples/).
 - Utdraget som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns)
-- [Samples av parquet-filer (1-minutersaggregat)](samples/).
 
 ### Schema aggregates
 
