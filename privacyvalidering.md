@@ -183,6 +183,7 @@ Dessa lagras alltså inte i 1-minuters-aggregaten (parquet-filerna), och exister
 
 - Koden för hur EDM publicerar events finns här: [github.com/dnstapir/edm...](github.com/dnstapir/edm...)  
 - Eventuellt: Visa sample från NATS key-value store.
+- Eventuellt: Kod-exempel för att leta efter ett eller många kända unika domännamn i TAPIR Core Dataset
 
 ## Påstående: Unikt identifierbara dns-fråge-mönster i TAPIR Core aggregat är extremt osannolikt
 
@@ -192,20 +193,18 @@ Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna v
 
 Förutsätter att de domänerna finns i wellknown +  otur med den hashade adressen, HLL-sketchen
 
-För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.
+För att en domän ska finnas i aggregat behöver den finnas i well known-listan som är baserad på Open Page Rank och liknande publika källor.  
+(Well-known-filen finns här: [github.com/dnstapir/...](github.com/dnstapir/...)  Edge-operatören kan ersätta med valfri.)
 
-Todo: Script som genererar well known-filen publiceras
+Även om en unikt identitiferbar domän finns i Core dataset, så går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
 
-Även om en unikt identiferbar domän finns, går det inte att identifera individ. För att det ska hända så behöver en kombination av unikt utseende på hll-sketchen plus unikt identiferbar domän existera. 1 person med unikt utseende på hll-sketchen frågar efter samma unika domän regelbundet..
-
-**Förändringar som planeras, säkerhetsåtgärd så att det inte ska kunna ske:**
+**Förändringar som planeras, ytterligare säkerhetsåtgärd så att det inte ska kunna ske:**
 Dela upp Well Known Domains i:
 
 - Well well known.  (google.com, apple.com osv)
 - Less well known. Annan metodik för HLL-sketchen, går då inte jämföra kardinalitet mellan domäner. HLL-sketchen genereras utifrån IP-adress+domänen
 
 Förslag på ytterligare säkerhetsåtgärder om det skulle anses nödvändigt: 
-
 - Endast domäner med x antal förfrågningar kan existera i wellknown.
 
 Varför är det viktigt?
