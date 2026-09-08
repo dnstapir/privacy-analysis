@@ -100,12 +100,9 @@ Exempel på 5-minuters-aggregat.
 
 ![img1](img/4.png)
 
-En verklig IP-adress lagras som en sträng eller ett BINARY(4) för IPv4, BINARY(16) för IPv6 (?). 32 bytefält (?).
-Fråga: Behöver check göras i HLL-fältet?
+En verklig IP-adress lagras som en sträng eller ett binärfält. Det enda binärfält som existerar i datasetet är HLL-sketcher vilka per definition inte kan innehålla explicita IP-adresser.
 
 ### Verifiering av att inga explicita IP-adresser finns i TAPIR Core
-
-Fråga: Hur stort sample behöver det vara?
 
 ![img5](img/5.png)
 
@@ -132,20 +129,33 @@ ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
-För att inga implicita IP-adresser ska gå att identifiera i HLL-sketch så Implementeras kryptering av IP-adress med CryptoPAN före hashning.
+För att inga implicita IP-adresser ska gå att identifiera i HLL-sketch så implementeras kryptering av IP-adress före beräkning av HLL-sketch. 
+
+Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som  för vissa IP-adresser kan vara igenkännbara. Vilka IP-adresser detta är kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd.  
+
+Simulering och beräkningar finns här:
+[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)x
+
 
 **Validering**
-...
+- Källkodsgranskning i EDM. Repo (bilaga)
+
 
 ## Påstående: Exakta tidsstämplar existerar inte i TAPIR Core dataset
 
 Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan logg-data för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller.
 
-För att en exakt tidstämpel ska vara relevant för att följa sekvenser av frågor behövs: datum, timme, minut, sekund (lägg till: referens?)
+Baserat på .... minutaggregat i kombination med att datasetet endast innehåller domäner i Well Known så är identifiering av individuellt beteende 
 
-I TAPIR Core existerar endast 1-minuters-aggregat, dvs inga exakta tidsstämplar.
+Låg upplösning i TAPIR Core.
+Jämförelsevis DNS FIngerprinting-paper är upplösningen mycket högre.. 
 
-Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet togs emot av TAPIR Core, vilket visar när minut-intervallet startar.
+Vilka kända attacker finns? Vilken upplösning krävs?
+
+
+I TAPIR Core existerar endast 1-minuters-aggregat
+
+Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar.
 
 ### Validering
 
@@ -158,36 +168,73 @@ Den enda sekund-tidsstämpeln som existerar är i metadatat, när aggregatet tog
 
 **Utdrag 1-min aggregat**
 
+Todo: Distinct. Se flera minuter + creator
+(förslag - EDM forcerar tidsstämpeln till YYYY-MM-DD-HH-MM för enhetlighet)
+
 ![img7](img/7.png)
 
-### Verifiera att alla poster endast har 0 som sekundvärde
+
 
 - Notebook finns tillgänlig publikt med sample parquet-fil  [samples/ViewParquet.ipynb](samples/ViewParquet.ipynb)
 - Utökas med fler verifieringar vid behov.
 
 ![img8](img/8.png)
 
+
+
+
 ## Påstående: Unikt identifierbara domäner, förfrågningar, existerar endast som events
 
-Unika domäner, publiceras till TAPIR Core, och genererar en observation av ny domän. 
+ Tidigare osedda domäner,  genererar en observation av ny domän i TAPIR Core. Dessa kan potentiellt innehålla unika namn. TAPIR Core aggregat innehåller endast domäner som existerar i Well Known. 
 
-Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.someonesid.example.com
+En unik domän är en domän som bara får frågor från en eller ett fåtal användare. Detta kan bero på att domänen har få besökare, t.ex en personlig websida, eller att domänen används för att spåra individer genom unika subdomäner. Exempelvis annonstjänster kan använda sig av det. 
 
-Dessa events lagras i TAPIR Core Feature Store: 
-- domännamnet
-- Vilken creator (TAPIR Edge) som observerade domänen.
-- Metadata: tidsstämpel när eventet publicerades (inte när DNS-uppslaget gjordes).  
+Att unika domäner blir en observation av ny domän är inte ett problem...
 
+Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.advertising.example.com
+Exempel: nissetuta.nissetutasweb.se
+
+Exempel:  domäner som inte används längre 
+
+Eventen lagras separat från aggregaten, en gång per resolver som sett frågan en gång. Samt enda information:
+- domännamn
+- creator (TAPIR Edge)
+- Tidsstämpel när eventet publicerades 
+
+Det gör att dessa unika domäner inte kan användas för att göra identifierande analys.
 Dessa lagras alltså inte i 1-minuters-aggregaten (parquet-filerna), och existerar inte i datasetet.
+
 ### Validering
+
+- Verifiera att alla kända contentnätverk (CDN) inlagda på rätt sätt i Well Known. Kanske publicera TAPIR listan på kända CDNS och annonsnätverk (?)
+- Publicera Well Known-filen så att vem som helst kan slå upp egna kända ovanliga eller integritetskänsliga domännamn.  Publicera dokumentation och kod för att undersöka Well Known efter sin adress.
+- Undersök dataset efter domäner med fåtal frågor och besluta om den ska uteslutas ur Well Known och endast hanteras som event. Publicera notebook för att hitta dessa domäner. 
+- Granskande analytiker kan erbjudas konton
+- Publicera 5-minuters-aggregat publikt
+- 
+
+
+https://dnstapir.github.io/techdocs/postinstall.html
+
+
 
 - Koden för hur EDM publicerar events finns här: [github.com/dnstapir/edm...](github.com/dnstapir/edm...)  
 - Eventuellt: Visa sample från NATS key-value store.
 - Eventuellt: Kod-exempel för att leta efter ett eller många kända unika domännamn i TAPIR Core Dataset
+- 
 
 ## Påstående: Unikt identifierbara dns-fråge-mönster i TAPIR Core aggregat är extremt osannolikt
 
 ---- WORK IN PROGRESS ----
+
+**Vad är problemet**
+
+**Hur stort är problemet?**
+
+**Vilka lösningar finns?**
+
+**Är operatören GDPR-compliant även innan detta eventuella problem är löst?**  
+Dvs kan operatören gå i produktion med TAPIR som TAPIR:en fungerar 
 
 Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna vara t.ex ett hushåll i HLL-sketchen? Och utifrån den avsändaridentiteten följa ett mönster t.ex:  internetstiftelsen.se -> gnestafågelskådare -> gnestalillaförskola -> skobesgnesta?
 
@@ -213,16 +260,18 @@ Hantering av longitudinell analys...  ska inte kunna leta upp intressant i aggre
 
 ### Validera
 
-- Genomför en membership inference attack (kostar)
+- Vi vill visa operatören att detta är extremt osannolikt, att det inte ett problem för GDPR-compliance och att det är ett avancerat case som vi undersöker för att DNS TAPIR har särskilda egna integritetskrav på datasetet.
+- Genomför en membership inference attack (kostar, akademi)
 - M visar en PoC på en membership inference attack, 9/9, spela in
 - Beräkna sannolikheten att  identifiera en enskild “avsändaridentitet” i HLL-sketcher
+- Förtroende byggs upp över tid genom att DNS TAPIR granskar sig själv och med DNS-community och akademin.
 
 **Sannolikhet för att identifiera en ensild användaridentitet**
 
 Sannolikheten har beräknats enligt... och är ...
 
 Simulering och beräkningar finns här:
-[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
+[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)x
 
 Frågor:
 
