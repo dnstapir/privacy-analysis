@@ -195,7 +195,9 @@ En lösning som planeras för små operatörer: skapa en Aggregations-Edge
 
 **Anteckningar, frågor**
 Sekundtidsstämplar ... RFC... Matcha tidsstämplar
+
 Vilka kända attacker finns? Vilken upplösning krävs?
+
 RFC 9076 [https://www.rfc-editor.org/info/rfc9076/](https://www.rfc-editor.org/info/rfc9076/)
 
 ### Validering
