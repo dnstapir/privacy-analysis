@@ -193,7 +193,8 @@ Det gör det mycket svårt att matcha med exempelvis en webblogg hos en större 
 **Vidareutveckling för mindre operatörer**
 En lösning som planeras för små operatörer: skapa en Aggregations-Edge
 
-**Anteckningar, frågor**
+#### Anteckningar, frågor
+
 Sekundtidsstämplar ... RFC... Matcha tidsstämplar
 
 Vilka kända attacker finns? Vilken upplösning krävs?
