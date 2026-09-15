@@ -1,17 +1,33 @@
-# Validering av personlig integritet i TAPIR Core dataset
+# Validering av personlig integritet och GDPR-efterlevnad i TAPIR Core dataset
 
 ---DETTA ÄR ETT UTKAST. WORK IN PROGRESS---
 
 ## Bakgrund
 
-- GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym.
+- GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym. 
 - Anonymiserade uppgifter anses inte längre vara personuppgifter och faller därmed utanför GDPR:s tillämpningsområde.
 - Anonymiseringen ska vara irreversibel.
 - Det finns tre huvudrisker för avidentifiering: särskiljbarhet, länkbarhet samt inferens
 
+(Källla: EU:s dataskyddsförordning)
+
 DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
 
 Uppskattning av unika domän-förfrågningar görs med algoritmen HyperLogLog (HLL) utan att lagra hela datasetet
+
+## Regelbundna revisioner, internt
+Nedan beskrivs ett antal valideringar och kontroller som genomförs inom open source-projektet. Dessa kan också genomföras av operatören eller andra granskare som operatören utsett.
+
+När projektet har bekräftat att TAPIR Core dataset kan delas till tredje part och framöver även allmänheten kan dessa valideringar även göras av dessa.
+
+Egna förslag för validering, uppmuntras som bidrag till Open Source-repositoryt "privacy-analysis". https://github.com/dnstapir/privacy-analysis
+
+### Rutin
+- DataLoad (skapande av 5-minutersaggregat baserat på 1-minutersaggregaten) körs minst 1 gång/vecka (senare automatiserat löpande) Efter DataLoad - exekvera validering av 5-minutershistogram nedan på ett urval av: ...  
+
+## Extern revision
+Publicerade notebooks för granskning av TAPIR Core dataset kan exekveras mot publicerade dataurval, eller verklig datakälla under förutsättning att behörigheter finns. Samt för egen installation.
+
 
 ## Påstående: Explicita IP-adresser existerar inte i TAPIR Core dataset
 
@@ -22,14 +38,17 @@ Exempel på sådana domännamn och tjänster som använder dessa är:
 4.4.8.8.in-addr.arpa
 4.3.3.7.0.7.3.0.e.2.a.8.0.0.0.0.0.0.0.0.3.a.5.8.8.b.d.0.1.0.0.2.ip6.arpa
 
-Exempel: Andra kan använda/koda IP-adress till domännamnet/frågan
-Om ip-liknande data som finns i frågematerialet, utanför 
+Andra aktörer kan använda/koda IP-adress till domännamnet/frågan vilket är utanför DNS TAPIR kontroll.  Tillgängliggörandet av DNS-frågor för analys innebär att bland annat kunna hitta dessa typer av domännamn för rapportering av privacy-läckage. 
+
+-- todo: beskriv  problemet och ansvarsfriheten tydligare, ge fler exempel? -- 
 
 Exempel: spamhouse-tjänsten, kodar ip-tjänster
-Exempel: enum (telefonnummer), gotanet...
+Ett annat exempel är att telefonnummer kan vara kodade i domännamnet, vilket likaså är utanför DNS TAPIRs databehandling.
+Exempel: enum (telefonnummer), gotanet
+
+någon annan kan ta ip-adressen + koda med byte64 - fråga efter....
 
 **Validering**:
-
 - Dataschemat inklusive datatyper
 - Utdrag dataset Core 5-min-aggregat 
 - Utdrag dataset Core 1-min aggregat,[Samples av parquet-filer (1-minutersaggregat)](samples/).
@@ -39,6 +58,8 @@ Exempel: enum (telefonnummer), gotanet...
 - Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns)
 
 ### Schema aggregates
+
+I framtiden, när det för privata aktörer finns en konfiguration för att skicka med IP-adresser, behöver också synas i schema-exempel vilken konfig Edge har. 
 
 ```text
 root
@@ -108,22 +129,19 @@ Utdrag 5-minuters-aggregat.
 
 En verklig IP-adress lagras som en sträng eller ett binärfält. Det enda binärfält som existerar i datasetet är HLL-sketcher (se ovan). HLL-sketcher kan per definition inte innehålla explicita IP-adresser. Referens:  https://datasketches.apache.org/docs/HLL/HllSketches.html
 
-(todo: nämna spamhouse-exemplet?)
-någon annan kan ta ip-adressen + koda med byte64 - fråga efter) 
 ### Verifiera att inga explicita IP-adresser finns i TAPIR Core
 
-Todo: Beskriv samplet.
-Todo: Hur ofta bör detta köras? 1 ggn/mån?  En minut/Edge. 
-
-Kom ihåg: När det finns en konfig för att skicka med IP-adresser, behöver också synas vilken konfig Edge har. 
- 
 ipv4-mönster utökas vid behov.
-oktalprefix ipv4 0.14
+utöka med oktalprefix ipv4 0.14
+
+![img35](img/img35.png)
+
+![img22](img/img22.png)
 
 ![img5](img/5.png)
 
-ipv6_pattern utökas vid behov, exakt alla ipv6-format täcks inte i detta exempel.
-(konvertera upper case)
+ipv6_pattern utökas vid behov,  alla ipv6-format täcks inte i detta exempel.
+(todo: konvertera först till upper case för enklare pattern)
 ```python
 ipv6_pattern = (
     r"([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|"
@@ -149,37 +167,36 @@ Fråga: Är det här ett GDPR-problem eller inte?
 
 För att inga implicita IP-adresser ska gå att identifiera i HLL-sketch så implementeras kryptering av IP-adress med t.ex AES före beräkning av HLL-sketch. Då går inte att reversera till IP-adresser.
 
-(uppmaning att använda samma "hemlighet" seed på alla Edge hos en operatör för att kunna merga HLL-sketcher - beräkna antal klienter utan dubbletter)
+Med denna kryptering så uppmanas att använda samma "hemlighet", seed, på alla Edge hos en operatör för att kunna merga HLL-sketcher mellan dessa. Dvs kunna beräkna antal klienter utan dubbletter.
 
-Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som  för vissa IP-adresser kan vara igenkännbara. Hashas till "många 0:or i mitten". Vilka IP-adresser detta är kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd.  (Med rainbow table går det att återskapa IP-adress). Behöver känna till konfigurationsparametrar till HLL-strukturen, går att göra kvalificerade gissningar. 
+Problemet utan kryptering: 
+Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som  för vissa IP-adresser kan vara igenkännbara. Vissa IP-adresser kan hashas till "många 0:or i mitten". Vilka IP-adresser som får detta kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd.  Med rainbow table går det då att återskapa IP-adress. För att göra detta behöver kunskap finnas om konfigurationsparametrar till HLL-strukturen, det går även att göra kvalificerade gissningar. 
 
-Simulering och beräkningar finns här:
+Simulering och beräkningar av problemet:
 [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)x
 
 **Validering**
-- Källkodsgranskning i EDM. Repo (bilaga)
+- Validera att IP-adresser krypteras innan HLL-sketch beräknas. Görs genom källkodsgranskning i EDM. Repo: under arbete
 
+## Påstående:  Sekund-tidsstämplar existerar inte i TAPIR Core dataset
 
-## Påstående:  Sekund-tidsstämplar existerar inte i TAPIR Core dataset 
+-- REVIEW --
 
-- Sekundtidsstämplar ... RFC... Matcha tidsstämplar
-- 
-Tidsstämplar kan utgöra en identifieringsrisk om de är exakta, eftersom de potentiellt kan matchas mot annan logg-data för att spåra en individs aktivitet. Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut.
+Tidsstämplar kan utgöra en identifieringsrisk om de är exakta på sekundnivå, eftersom de potentiellt kan matchas mot annan logg-data, t.ex webblogg, för att spåra en individs aktivitet.
 
-Webblogg-matchning med 1 minuts aggregat blir svårt på en "större" operatör. Större = ... 
-Liten mängd användare lättare att matcha. 
-för små operatörer: skapa en Aggregations-Edge
+Referens?
 
-Baserat på .... minutaggregat i kombination med att datasetet endast innehåller domäner i Well Known så är identifiering av individuellt beteende 
+Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar.
 
-Låg upplösning i TAPIR Core.
-Jämförelsevis DNS FIngerprinting-paper är upplösningen mycket högre.. 
+Det gör det mycket svårt att matcha med exempelvis en webblogg hos en större operatör. Större = minst n klienter/minut. Dessutom innehåller TAPIR Core dataset endast domänförfrågningar på domäner som ingår i Well Known-listan, se nedan.
 
+**Vidareutveckling för mindre operatörer**
+En lösning som planeras för små operatörer: skapa en Aggregations-Edge
+
+**Anteckningar, frågor**
+Sekundtidsstämplar ... RFC... Matcha tidsstämplar
 Vilka kända attacker finns? Vilken upplösning krävs?
-
-I TAPIR Core existerar endast 1-minuters-aggregat
-
-Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar.
+RFC 9076 [https://www.rfc-editor.org/info/rfc9076/](https://www.rfc-editor.org/info/rfc9076/)
 
 ### Validering
 
@@ -188,16 +205,14 @@ Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar n
 - Utdraget av 1-min-aggregat som CSV (exkl HLL) för egen analys, vid förfrågan
 - Publikt tillgänglig notebook med kod-exempel för att presentera dataschemat.  [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
 - Publikt tillgänglig notebook med kod-exempel för att söka efter ip-adress (IPv4, IPv6) [samples/PrivacyCheck.ipynb](samples/PrivacyCheck.ipynb)
-- Notebooks kan exekveras mot verklig datakälla (under förutsättning att behörigheter finns) eller egen installation.
 
 **Utdrag 1-min aggregat**
 
 Todo: Distinct. Se flera minuter + creator
-(förslag - EDM forcerar tidsstämpeln till YYYY-MM-DD-HH-MM för enhetlighet)
 
-Formatet i parquet-filen... Tidsstämplar skickas binärkodade enligt parquet-stämplar. 
+Tidsstämpeln som syns i 1-minutersaggregat är när aggregatet publicerades till TAPIR Core. Samma minut - samma Edge.  (förslag - EDM forcerar tidsstämpeln till YYYY-MM-DD-HH-MM för enhetlighet, vill vi det?)
 
-Tidsstämpeln är när aggregatet publicerades till TAPIR Core. Samma minut - samma Edge. Samma tidsstämpel på varje rad (!)
+Tidsstämplar skickas binärkodade enligt parquet-tidsstämpelformat.
 
 ![img7](img/7.png)
 
@@ -206,52 +221,59 @@ Tidsstämpeln är när aggregatet publicerades till TAPIR Core. Samma minut - sa
 
 ![img8](img/8.png)
 
+## Påstående: TAPIR Core dataset innehåller endast domäner från Well Known-listan
 
-## Påstående: Unika domän-förfrågningar existerar en gång i TAPIR Core
+1-minutersaggregaten innehåller endast frågor på domäner i Well Known-listan. Det innebär att upplösningen på datasetet i TAPIR Core är låg. Alla frågor finns inte i datasetet. 
+
+Antal domäner i den i installationspaketet föreslagna Well Known-listan är: minst x
+Antal nya domäner (dvs ej i Well Known och ej i 1-minutersaggregat) som observeras under en minut är: y för <operatör>
+
+En stor mängd domänförfrågningar finns alltså inte i 1-minutersaggregaten.
+
+**Referenser, omvärld**
+I analyser av beteendeavtryck, "fingerprints", på DNS-frågor då individer har identifierats, har de dataset som används en betydligt högre tidsupplösning än DNS TAPIR. Ofta på sekundnivå.
+Då har också alla dns-förfrågningar, domänuppslag ingått i datasetet som analyserats, till skillnad från den lägre upplösningen i TAPIR Core, som enbart innehåller Well Known-domäner. 
+
+Exempel: A_User_DNS_Fingerprint_Dataset.pdf, Zápotockýa et al
+
+Det är Well Known-filen som styr vilka domännamn som är tillgängliga i aggregaten för analys.
+För att bekräfta att det inte förekommer unika domännamn i Well Known gör projektet regelbundna kontroller av vilka domäner som finns i Well Known-filen. 
+### Validering
+
+- Jämför antal domäner i Well Known med antal nya observerade domäner? 
+- Undersök att aktuell Well Known-fil används: https://dnstapir.github.io/techdocs/postinstall.html#maintaining-the-well-known-domains-filter
+- Publicera Well Known-filen så att operatörer och allmänheten kan slå upp ovanliga eller integritetskänsliga domännamn.  Publicera dokumentation och kod för att undersöka Well Known efter sin adress.
+
+#### Anteckningar
+
+- Verifiera att alla kända contentnätverk (CDN) är inlagda på rätt sätt i Well Known. Kanske kan TAPIR publicera listan på kända CDNS och annonsnätverk och logiken för hur de hanteras med wildcard (?) 
+
+## Påstående: Ovanliga domän-förfrågningar existerar en gång i TAPIR Core
 
 Hur kopplas detta till privacy-problemet?
 
- Tidigare osedda domäner,  genererar en observation av ny domän i TAPIR Core. Dessa kan potentiellt användas för att . TAPIR Core aggregat innehåller endast domäner som existerar i Well Known. 
+ Tidigare osedda domäner,  genererar en observation av ny domän i TAPIR Core. Dessa skulle potentiellt kunna användas för att följa en individs unika beteende (?)....
 
-En unik domän är en domän som bara får frågor från en eller ett fåtal användare. Detta kan bero på att domänen har få besökare, t.ex en personlig websida, eller att domänen används för att spåra individer genom unika subdomäner. Exempelvis annonstjänster kan använda sig av det. 
+En unik domän är en domän som bara får frågor från en eller ett fåtal användare. Det kan bero på att domänen har få besökare, t.ex en personlig webbsida, eller att domänen används för att spåra individer genom unika sub-domäner. Exempelvis annonstjänster kan använda sig av det.
 
-Att unika domäner blir en observation av ny domän är inte ett problem...
+Att unika domäner blir en enda observation av ny domän är inte ett problem eftersom ingen information följer med i observationsdatat som kan användas för identifiering.
 
-Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.advertising.example.com
+Exempel: 87rxrdobfl4goostvxilqmxnm36bmqou.ad.example.com
 Exempel: nissetuta.familjenswebsida.exempel.se
+Exempel:  domäner som inte används längre
 
-Exempel:  domäner som inte används längre 
-
-Eventen lagras separat från aggregaten, en gång per resolver som sett frågan en gång. Samt enda information:
+Event för ny domän lagras separat från aggregaten, alltså inte i 1-minuters-aggregaten. Event lagras en gång per Edge som sett frågan en gång.
 - domännamn
 - creator (TAPIR Edge)
 - Tidsstämpel när eventet publicerades 
 
-Det gör att dessa unika domäner inte kan användas för att göra identifierande analys.
-Dessa lagras alltså inte i 1-minuters-aggregaten (parquet-filerna), och existerar inte i datasetet.
-
 ### Validering
 
-Det är Well Known-filen som styr vilka domännamn som är tillgängliga i aggregaten för analys. 
-För att bekräfta att det inte förekommer unika domännamn i Well Known gör projektet regelbundna kontroller av vilka domäner som finns i Well Known-filen. 
-
-- Undersök att aktuell Well Known-fil används: https://dnstapir.github.io/techdocs/postinstall.html#maintaining-the-well-known-domains-filter
-- Verifiera att alla kända contentnätverk (CDN) är inlagda på rätt sätt i Well Known. Kanske kan TAPIR publicera listan på kända CDNS och annonsnätverk och logiken för hur de hanteras med wildcard (?)
-- Publicera Well Known-filen så att operatörer och allmänheten kan slå upp ovanliga eller integritetskänsliga domännamn.  Publicera dokumentation och kod för att undersöka Well Known efter sin adress.
-- Undersök dataset efter domäner med fåtal frågor och besluta om den ska uteslutas ur Well Known och endast hanteras som event. Publicera notebook för att hitta dessa domäner. 
-- Granskande analytiker kan erbjudas konton
-- Publicera 5-minuters-aggregat publikt
-- 
-
-
-https://dnstapir.github.io/techdocs/postinstall.html
-
-
-
 - Koden för hur EDM publicerar events finns här: [github.com/dnstapir/edm...](github.com/dnstapir/edm...)  
+- Undersök dataset efter domäner med fåtal frågor och besluta om den ska uteslutas ur Well Known och endast hanteras som event. Publicera notebook för att hitta dessa domäner.
+- Senare: Publicera ett urval av 5-minuters-aggregat publikt, med regelbundenhet
 - Eventuellt: Visa sample från NATS key-value store.
 - Eventuellt: Kod-exempel för att leta efter ett eller många kända unika domännamn i TAPIR Core Dataset
-- 
 
 ## Påstående: Unikt identifierbara dns-fråge-mönster i TAPIR Core aggregat är extremt osannolikt
 
@@ -264,7 +286,7 @@ https://dnstapir.github.io/techdocs/postinstall.html
 **Vilka lösningar finns?**
 
 **Är operatören GDPR-compliant även innan detta eventuella problem är löst?**  
-Dvs kan operatören gå i produktion med TAPIR som TAPIR:en fungerar 
+Dvs kan operatören gå i produktion med TAPIR som TAPIR:en fungerar
 
 Går det att hitta en frågeställare, en avsändaridentitet, som skulle kunna vara t.ex ett hushåll i HLL-sketchen? Och utifrån den avsändaridentiteten följa ett mönster t.ex:  internetstiftelsen.se -> gnestafågelskådare -> gnestalillaförskola -> skobesgnesta?
 
@@ -281,7 +303,8 @@ Dela upp Well Known Domains i:
 - Well well known.  (google.com, apple.com osv)
 - Less well known. Annan metodik för HLL-sketchen, går då inte jämföra kardinalitet mellan domäner. HLL-sketchen genereras utifrån IP-adress+domänen
 
-Förslag på ytterligare säkerhetsåtgärder om det skulle anses nödvändigt: 
+Förslag på ytterligare säkerhetsåtgärder om det skulle anses nödvändigt:
+
 - Endast domäner med x antal förfrågningar kan existera i wellknown.
 
 Varför är det viktigt?
