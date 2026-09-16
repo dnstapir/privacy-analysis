@@ -1,4 +1,4 @@
-# Validering av personlig integritet och GDPR-efterlevnad i TAPIR Core dataset
+# Validering av GDPR-efterlevnad i TAPIR Core dataset
 
 ---DETTA ÄR ETT UTKAST. WORK IN PROGRESS---
 
