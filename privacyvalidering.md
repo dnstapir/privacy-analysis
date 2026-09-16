@@ -58,7 +58,7 @@ Dessa aktiviteter kan genomföras inom TAPIR projektorganisation, av operatören
 
 #### Sök efter sekundtids-stämpel i domänförfrågningar
 
-Genom att inte inkludera finkorninga tidsangivelser minskar möjligheten att identifiera avtryck från individ. TAPIR Core aggregat innehåller endast minutangivelser.
+Genom att inte inkludera finkorninga tidsangivelser minskar möjligheten att identifiera avtryck från individ... [beskriv närmare]. TAPIR Core aggregat innehåller endast minutangivelser.
 
 - Sök efter sekundtidsstämpel i aggregat
 
