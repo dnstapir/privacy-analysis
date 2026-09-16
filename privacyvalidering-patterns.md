@@ -57,3 +57,5 @@ Frågor:
 - Går det att se ett mönster från den enskilda entiteten
 - Beskriv: Hur göra för att hitta en unikt identifierbar frågeställare i HLL-sketch. Ta fram ett frågemönster för denna avsändar-identitet (= Membership inference attack?).
 - Är det tillräckligt ovanligt för att anses som osannolikt?
+
+[/privacyvalidering-testscripts.md](/privacyvalidering-testscripts.md)

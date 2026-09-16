@@ -262,5 +262,3 @@ Se: [privacyvalidering-patterns.md](privacyvalidering-patterns.md)
 ### TAPIR Core Dataset - 1 minuters-aggregat
 
 ### TAPIR Core Events och observationer
-
-[/privacyvalidering-testscripts.md](/privacyvalidering-testscripts.md)
