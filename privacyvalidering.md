@@ -88,3 +88,7 @@ Exempel på observation av eventet ny domän:
 
 - Undersök Well Known-fil
 - Membership Inference Attack. Önskvärt, kostsamt och tidskrävande. Sannolikt inte nödvändigt för GDPR-efterlevnad utan enbart för DNS TAPIR utökade integritetsmål.
+
+## Exempel dataschema och testscript
+
+[/privacyvalidering-testscripts.md](/privacyvalidering-testscripts.md)
