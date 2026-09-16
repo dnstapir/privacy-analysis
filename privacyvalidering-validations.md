@@ -146,7 +146,7 @@ Problemet utan kryptering:
 Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som  för vissa IP-adresser kan vara igenkännbara. Vissa IP-adresser kan hashas till "många 0:or i mitten". Vilka IP-adresser som får detta kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd.  Med rainbow table går det då att återskapa IP-adress. För att göra detta behöver kunskap finnas om konfigurationsparametrar till HLL-strukturen, det går även att göra kvalificerade gissningar.
 
 Simulering och beräkningar av problemet:
-[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)x
+[/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
 
 **Validering**
 

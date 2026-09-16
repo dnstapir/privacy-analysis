@@ -4,7 +4,7 @@
 
 ## Bakgrund
 
-- GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym. 
+- GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym.
 - Anonymiserade uppgifter anses inte längre vara personuppgifter och faller därmed utanför GDPR:s tillämpningsområde.
 - Anonymiseringen ska vara irreversibel.
 - Det finns tre huvudrisker för avidentifiering: särskiljbarhet, länkbarhet samt inferens
@@ -14,6 +14,7 @@
 DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
 
 ## Risker för personlig integritet och åtgärder
+
 När ett dataset med DNS-frågor delas finns en risk att en individ kan identifieras genom frågesekvenser. Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet.  
 
 Några åtgärder:
@@ -30,9 +31,11 @@ Dokumentation av dataarkitektur och dataöverföring från TAPIR Edge till TAPIR
 ## Mål: TAPIR Core dataset är validerat att inte inkludera personlig data enligt GDPR
 
 ### Omfattning
+
  Utvärderingen täcker dataflödet från TAPIR Edge till TAPIR Core, de minimerade och anonymiserade dataset som lämnar operatörens resolver. Detta är aggregat i form av parquet-filer, samt events i form av en key-value-databas.
 
 ### Revisionsmetod
+
 GDPR-efterlevnad uppnås inte vid enskilt tillfälle, det underhålls löpande. Personlig integritet i dataset bör monitoreras kontinuerligt.
 
 Dessa aktiviteter kan genomföras inom TAPIR projektorganisation, av operatörens egna granskare eller av extern granskare med behörigheter.
@@ -40,17 +43,18 @@ Dessa aktiviteter kan genomföras inom TAPIR projektorganisation, av operatören
 - Sök efter PII (Personliga identifierare), i detta fall IP-adresser.
 - Testa för åter-identifiering. Exempelvis: Är HLL-sketch (räknare av uppskattat antal klienter) irreversibel?
 - Testa för att hitta sekund-tidsstämplar och ovanliga domänförfrågningar som potentiellt skulle kunna användas för att identifera mönster
-- Eventuellt, kanske ej nödvändigt för GDPR-efterlevnad: Testa för att hitta frågemönster tillhörande en eller ett fåtal unika frågeställare, samt korrelera sådana sekvenser med annan information för att identifiera individ. 
+- Eventuellt, kanske ej nödvändigt för GDPR-efterlevnad: Testa för att hitta frågemönster tillhörande en eller ett fåtal unika frågeställare, samt korrelera sådana sekvenser med annan information för att identifiera individ.
 - Automatisera, eller semi-automatisera dessa aktiviteter
 - Logga mätvärden och resultat av testen.
 
-####  Sök efter PII (personliga identifierare)
+#### Sök efter PII (personliga identifierare)
 
 - Sök efter IP-adress i aggregat
 
-####  Testa för återidentifiering
+#### Testa för återidentifiering
 
-- Utifrån en HLL-sketch samt ett känt subnät, försök återidentifiera en IP-adress. Alternativt beräkna sannolikheten.
+- Beräkna sannolikheten för risk att återidentifera en IP-adress från HLL-sketch. [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
+- Eventuellt: Utifrån en HLL-sketch samt ett känt subnät, försök återidentifiera en IP-adress. Simulering och beräkningar av problemet:
 
 #### Sök efter sekundtids-stämpel i domänförfrågningar
 
@@ -78,10 +82,9 @@ Exempel på observation av eventet ny domän:
 
 #### Automatisering av valideringstest
 
-- När DataLoad exekveras (sammanställning av 1-minutersaggregat till 5-minutersaggregat), exekvera grundläggande test av innehållet i aggregaten, på ett urval. Grundläggande test: Sök efter IP-adress och sekundstämplar. 
+- När DataLoad exekveras (sammanställning av 1-minutersaggregat till 5-minutersaggregat), exekvera grundläggande test av innehållet i aggregaten, på ett urval. Grundläggande test: Sök efter IP-adress och sekundstämplar.
 
 #### Manuell validering
 
 - Undersök Well Known-fil
 - Membership Inference Attack. Önskvärt, kostsamt och tidskrävande. Sannolikt inte nödvändigt för GDPR-efterlevnad utan enbart för DNS TAPIR utökade integritetsmål.
-
