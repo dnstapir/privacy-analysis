@@ -15,8 +15,9 @@ DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar i
 
 ## Risker för personlig integritet och åtgärder
 
-När ett dataset med DNS-frågor delas finns en risk att en individ kan identifieras genom frågesekvenser. Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet.  
+När ett dataset med DNS-frågor delas finns en risk att en individs surfbeteende kan identifieras genom frågesekvenser. En konsekvens av det skulle vara att en aktör kan få kännedom om personliga eller organisatoriska intressen och relationer som inte är avsett för publicitet. Sådan kännedom kan användas för att skada individer eller organisationer.
 
+Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet. 
 ###  Personer vars data kan beröras
 
 - Klienter (Internetanvändare) som använder TAPIR-ansluten DNS-resolver hos Internetoperatör. Dessa klienters DNS-frågor i nästan realtid.
@@ -44,11 +45,12 @@ Målgrupp är granskare av TAPIR Core dataset, t.ex jurister och tekniska gransk
 
 Syftet är att säkerställa att TAPIR Core dataset kan delas med tredje part och efterleva GDPR. Dvs att som tidigare juridisk granskning av informationsmodellen visat, är inte DNS TAPIR en data processor.
 
+Revisionsprocess inleds antingen av DNS TAPIR projektledare och/eller av TAPIR Edge-operatör.
 ### Omfattning
 
  Utvärderingen täcker datasetet som lämnat TAPIR Edge och mottas av TAPIR Core (den centrala analystjänsten). Alltså de minimerade och anonymiserade dataset som lämnar operatörens resolver. Detta är aggregat i form av parquet-filer, samt events i form av en key-value-databas.
 
-### Revisionsmetod
+### Revisionsprocess
 
 GDPR-efterlevnad uppnås inte vid enskilt tillfälle, det underhålls löpande. Personlig integritet i dataset bör monitoreras kontinuerligt.
 
@@ -60,6 +62,11 @@ Dessa aktiviteter kan genomföras inom TAPIR projektorganisation, av operatören
 - Eventuellt, kanske ej nödvändigt för GDPR-efterlevnad: Testa för att hitta frågemönster tillhörande en eller ett fåtal unika frågeställare, samt korrelera sådana sekvenser med annan information för att identifiera individ.
 - Automatisera, eller semi-automatisera dessa aktiviteter
 - Logga mätvärden och resultat av testen.
+
+#### Datakälla
+För att genomföra granskning behövs antingen åtkomst till TAPIR Core datakälla eller ett statistiskt konfident urval av 1-minutersaggregat (parquet-filer) och eventuellt 5-minuters-aggregat för enklare hantering.
+
+Åtkomst till datakälla tillhandahålls av Internetstiftelsen. 
 
 #### Sök efter PII (personliga identifierare)
 
@@ -89,6 +96,7 @@ Exempel på observation av eventet ny domän:
 ![img43](img/img36.png)
 
 #### Events?
+....
 
 #### Testa för att hitta frågemönster
 
@@ -102,6 +110,9 @@ Exempel på observation av eventet ny domän:
 
 - Undersök Well Known-fil
 - Membership Inference Attack. Önskvärt, kostsamt och tidskrävande. Sannolikt inte nödvändigt för GDPR-efterlevnad utan enbart för DNS TAPIR utökade integritetsmål.
+
+#### Loggning av resultat
+- ....
 
 ## Exempel dataschema och testscript
 
