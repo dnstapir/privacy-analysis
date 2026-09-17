@@ -17,22 +17,36 @@ DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar i
 
 När ett dataset med DNS-frågor delas finns en risk att en individ kan identifieras genom frågesekvenser. Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet.  
 
-Några åtgärder:
+###  Personer vars data kan beröras
+
+- Klienter (Internetanvändare) som använder TAPIR-ansluten DNS-resolver hos Internetoperatör. Dessa klienters DNS-frågor i nästan realtid.
+
+### Personer som använder data från DNS TAPIR Core
+
+Målet med denna revision är att analytiker från tredje part, utanför DNS TAPIR projektorganisation, ska kunna ta del av datasetet för analys
+
+#### Några åtgärder:
 
 - Uppskattning av antal unika domän-förfrågningar görs med anonymiseringsalgoritmen HyperLogLog (HLL) utan att lagra IP-adresser
 - Kryptering av IP-adresser innan beräkning med HLL
 - Potentiellt känsliga domänförfrågningar exkluderas från central analys (TAPIR Core)
 - Exkludera sekund-tidsstämplar på domänförfrågningar, endast 1-min aggregat är tillgängliga för analys
 
-Dokumentation av dataarkitektur och dataöverföring från TAPIR Edge till TAPIR Core finns här: [Informationshantering](https://www.dnstapir.se/docs/tapir-info-mgmt-sv/)
+Dokumentation av dataarkitektur, dataöverföring samt datalagring i TAPIR Edge och TAPIR Core finns här: [Informationshantering](https://www.dnstapir.se/docs/tapir-info-mgmt-sv/)
 
 ![img43](img/img43.png)
 
 ## Mål: TAPIR Core dataset är validerat att inte inkludera personlig data enligt GDPR
 
+## Målgrupp och syfte med dokumentet
+
+Målgrupp är granskare av TAPIR Core dataset, t.ex jurister och tekniska granskare inom eller utanför Open Source-projektet. 
+
+Syftet är att säkerställa att TAPIR Core dataset kan delas med tredje part och efterleva GDPR. Dvs att som tidigare juridisk granskning av informationsmodellen visat, är inte DNS TAPIR en data processor.
+
 ### Omfattning
 
- Utvärderingen täcker dataflödet från TAPIR Edge till TAPIR Core, de minimerade och anonymiserade dataset som lämnar operatörens resolver. Detta är aggregat i form av parquet-filer, samt events i form av en key-value-databas.
+ Utvärderingen täcker datasetet som lämnat TAPIR Edge och mottas av TAPIR Core (den centrala analystjänsten). Alltså de minimerade och anonymiserade dataset som lämnar operatörens resolver. Detta är aggregat i form av parquet-filer, samt events i form av en key-value-databas.
 
 ### Revisionsmetod
 
