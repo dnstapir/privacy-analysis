@@ -158,15 +158,15 @@ Med den kryptering av IP-adress som sker före HLL-beräkning uppmanas Edge-oper
 
 ## Påstående: Sekund-tidsstämplar existerar inte i TAPIR Core dataset
 
-Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar. Detta gör att en extern logg med sekundupplösning (t.ex. en webbservers `access_log`) inte deterministiskt kan matchas 1-till-1 mot en enskild TAPIR-observation hos en tillräckligt stor operatör. Se motivering nedan.
+Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar. Detta gör att en extern logg med sekundupplösning (t.ex. en webbservers `access_log`) inte deterministiskt kan matchas 1-till-1 mot en enskild TAPIR-observation hos en tillräckligt stor operatör. 
 
 **Vidareutveckling för mindre operatörer**
 Skapa en Aggregations-Edge.
 
-### Motivering: Frånvaro av sekund-tidsstämpel som anonymisering
+### Motivering: Frånvaro av sekund-tidsstämpel som anonymiseringsmetod
 
 Att TAPIR Core saknar sekundupplösning på tidsstämplar är ett aktivt anonymiseringsval. 
-Detta uppfyller GDPR:s tröskel för anonym data (skäl 26: "extremt osannolikt att identifiera"). 
+Det uppfyller GDPR:s tröskel för anonym data (skäl 26: "extremt osannolikt att identifiera"). 
 
 **1. RFC 9076 - DNS Privacy Considerations.**
 Identifierar granulariteten på tidsstämplar och aggregering av trafik som centrala faktorer för om DNS-data kan användas för spårning av enskilda klienter. Aggregerad data med grov tidsupplösning listas som en av de åtgärder som minskar risken. Källa: <https://www.rfc-editor.org/info/rfc9076>
@@ -184,12 +184,12 @@ Källa: L. Sweeney, *k-anonymity: A model for protecting privacy*, International
 **4. Mätning på TAPIR Core operatörsdata**
 Uppmät *k* för befintliga TAPIR-Edge-installationer. Förslag:
 
-- För varje `<Well Known-domän, minut, creator>`-histogram i ett representativt urval av aggregaten: rapportera fördelningen av uppskattat antal distinkta klienter, k. andel histogram med k < 5, k<10, mm
+- För varje `<Well Known-domän, minut, creator>`-histogram i ett representativt urval: rapportera fördelningen av uppskattat antal distinkta klienter, k. andel histogram med k < 5, k<10, mm
 - Publicera notebook: `samples/kAnonymityCheck.ipynb` (todo).
 
 **Kvarstående hot och åtgärder.**
 
-- Små operatörer där *k* -> 1 för många histogram: hanteras via planerad Aggregations-Edge.
+- Små operatörer där *k* == 1 för många histogram: hanteras via planerad Aggregations-Edge.
 - Well Known-domäner med extrem popularitetsobalans (frågas nästan bara av en typ av klient): hanteras via Well Known-granskning, se separat påstående.
 
 ### Validering
