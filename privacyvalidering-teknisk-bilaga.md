@@ -147,24 +147,21 @@ Simulering och beräkningar av problemet: [/becoming-uniquely-identifiable-in-a-
 3. Test som verifierar att EDM inte aggregerar om krypteringsnyckeln saknas. (Annars kan en felkonfigurerad Edge tyst publicera oskyddade sketcher.)
 
 #### Verifiera att resultatet är irreversibelt
-**Rainbow-table-simulering med och utan kryptering**. Fortsätt befintligt arbete i becoming-uniquely-identifiable-in-a-hyperloglog-sketch. Kör två varianter:
+**Rainbow-table-simulering med och utan kryptering**. Fortsätt befintligt arbete i becoming-uniquely-identifiable-in-a-hyperloglog-sketch. 
 
 - _Utan kryptering_: enumerera IP-rymd (t.ex. hela /24 eller /16), beräkna HLL-bidrag, mät hur många IP-adresser som ger unika register-signaturer. Detta är baseline-hotet.
-- _Med kryptering (samma seed)_: repetera. Förväntat resultat: unikhet reduceras till HLL:ens teoretiska brusnivå.
+- _Med kryptering (samma seed)_: repetera. Förväntat resultat: 
 
-Mätvärde att rapportera: andel IP-adresser i subnätet vars register-avtryck är särskiljbart, före vs efter kryptering.
-
+Mätvärde: andel IP-adresser i subnätet vars register-avtryck är särskiljbart, före vs efter kryptering.
 #### Anteckningar
 Med den kryptering av IP-adress som sker före HLL-beräkning uppmanas Edge-operatörer att använda samma "hemlighet" (seed) på alla Edge hos en operatör, för att kunna merga HLL-sketcher mellan dessa och beräkna antal klienter utan dubbletter.
 
 ## Påstående: Sekund-tidsstämplar existerar inte i TAPIR Core dataset
 
-Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar.
-
-Detta gör att en extern logg med sekundupplösning (t.ex. en webbservers `access_log`) inte deterministiskt kan matchas 1-till-1 mot en enskild TAPIR-observation hos en tillräckligt stor operatör. Se motivering nedan.
+Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar. Detta gör att en extern logg med sekundupplösning (t.ex. en webbservers `access_log`) inte deterministiskt kan matchas 1-till-1 mot en enskild TAPIR-observation hos en tillräckligt stor operatör. Se motivering nedan.
 
 **Vidareutveckling för mindre operatörer**
-En lösning som planeras för små operatörer: skapa en Aggregations-Edge.
+Skapa en Aggregations-Edge.
 
 ### Motivering: Frånvaro av sekund-tidsstämpel som anonymisering
 
