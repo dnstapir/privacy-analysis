@@ -116,4 +116,4 @@ Exempel på observation av eventet ny domän:
 
 ## Exempel dataschema och testscript
 
-[/privacyvalidering-testscripts.md](/privacyvalidering-testscripts.md)
+[/privacyvalidering-teknisk-bilaga.md](//privacyvalidering-teknisk-bilaga.md)
