@@ -130,4 +130,4 @@ Exempel på observation av eventet ny domän:
 
 ## Exempel dataschema och testscript
 
-[/privacyvalidering-teknisk-bilaga.md](//privacyvalidering-teknisk-bilaga.md)
+[/privacyvalidering-teknisk-bilaga.md](/privacyvalidering-teknisk-bilaga.md)
