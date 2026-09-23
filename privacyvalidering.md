@@ -13,11 +13,24 @@
 
 DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
 
+### TAPIR Core Dataset
+
+Datasetet i TAPIR Core består av 1-minuters-aggregat/räknare av DNS-uppslag för välkända domäner (Well Known Domains). Dessa aggregat, histogram, innehåller data för hur ett domännamn på en resolver (TAPIR Edge) användes under tidsfönstret. Hur populär domänen var: antal uppslag (antal frågor), en uppskattning av hur många olika användare som slog upp det (antal klienter) och om uppslagen fungerade normalt eller misslyckades.
+
+Ett DNS-uppslag sker varje gång någon (eller deras enhet) besöker en webbplats, skickar ett mejl eller öppnar en app.
+
+### HyperLogLog
+
+Algoritmen HyperLogLog (HLL) används för uppskattning av antal klienter. Den används i samverkan med andra åtgärder som exempelvis 1-minuters-aggregat, Well-known-listor etc så att summan av åtgärder blir privacy-säkert
+
+Fullständig beskrivning av hur datasetet hanteras finns här: [https://www.dnstapir.se/docs/tapir-info-mgmt-sv/](https://www.dnstapir.se/docs/tapir-info-mgmt-sv/)
+
 ## Risker för personlig integritet och åtgärder
 
 När ett dataset med DNS-frågor delas finns en risk att en individs surfbeteende kan identifieras genom frågesekvenser. En konsekvens av det skulle vara att en aktör kan få kännedom om personliga eller organisatoriska intressen och relationer som inte är avsett för publicitet. Sådan kännedom kan användas för att skada individer eller organisationer.
 
 Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet. 
+
 ###  Personer vars data kan beröras
 
 - Klienter (Internetanvändare) som använder TAPIR-ansluten DNS-resolver hos Internetoperatör. Dessa klienters DNS-frågor i nästan realtid.
@@ -46,6 +59,7 @@ Målgrupp är granskare av TAPIR Core dataset, t.ex jurister och tekniska gransk
 Syftet är att säkerställa att TAPIR Core dataset kan delas med tredje part och efterleva GDPR. Dvs att som tidigare juridisk granskning av informationsmodellen visat, är inte DNS TAPIR en data processor.
 
 Revisionsprocess inleds antingen av DNS TAPIR projektledare och/eller av TAPIR Edge-operatör.
+
 ### Omfattning
 
  Utvärderingen täcker datasetet som lämnat TAPIR Edge och mottas av TAPIR Core (den centrala analystjänsten). Alltså de minimerade och anonymiserade dataset som lämnar operatörens resolver. Detta är aggregat i form av parquet-filer, samt events i form av en key-value-databas.
