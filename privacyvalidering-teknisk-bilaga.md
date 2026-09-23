@@ -29,7 +29,14 @@ Exempel: spamhouse-tjänsten kodar IP-tjänster. Telefonnummer kan kodas i domä
 
 I framtiden, när det för privata aktörer finns en konfiguration för att skicka med IP-adresser, kommer det också synas i schemat vilken konfiguration Edge har.
 
-```text
+Schemat är formatterat enligt PySpark output och hämtas genom en fråga mot 5-minutershistogram i TAPIR Core Delta-tabeller. 
+
+``` 
+delta_db_path = "s3a://<path>/type=delta/wk_histogram_5m"
+delta_table = DeltaTable.forPath(spark, delta_db_path)
+df0 = delta_table.toDF()
+df0.printSchema()
+
 root
  |-- date: date (nullable = true)
  |-- creator: string (nullable = true)
