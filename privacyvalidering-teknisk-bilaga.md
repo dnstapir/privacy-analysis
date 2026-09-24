@@ -139,6 +139,8 @@ ipv6_nibble_pattern = r"[0-9a-fA-F](\.[0-9a-fA-F]){31}"
 Källa ipv6-format: [ ipv6-representation](https://www.networkacademy.io/ccna/ipv6/ipv6-address-representation)
 ## Påstående: Implicita IP-adresser existerar inte i TAPIR Core dataset
 
+Status: Under implementering
+
 IP-adresser krypteras före HLL-beräkning. Detta gör att det inte går att härleda en IP-adress från en HLL-sketch och sketchen är alltså är irreversibel.
 #### Problemet utan kryptering:
 Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som för vissa IP-adresser kan vara igenkännbara. Vissa IP-adresser kan hashas till "många 0:or i mitten". Vilka IP-adresser som får detta kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd. Med rainbow table går det då att återskapa IP-adress. För att göra detta behöver kunskap finnas om konfigurationsparametrar till HLL-strukturen; det går även att göra kvalificerade gissningar.
@@ -277,7 +279,7 @@ Event för ny domän lagras separat från aggregaten, alltså inte i 1-minuters-
 
 ## Påstående: Unikt identifierbara DNS-frågemönster i TAPIR Core aggregat är extremt osannolikt
 
-Se: [privacyvalidering-patterns.md](privacyvalidering-patterns.md)
+Se: [privacyvalidering-patterns.md](privacyvalidering-querypatterns.md)
 
 ## Datalagring
 
