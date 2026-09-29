@@ -27,8 +27,6 @@ Exempel: spamhouse-tjänsten kodar IP-tjänster. Telefonnummer kan kodas i domä
 
 ### Schema aggregates
 
-I framtiden, när det för privata aktörer finns en konfiguration för att skicka med IP-adresser, kommer det också synas i schemat vilken konfiguration Edge har.
-
 Schemat är formatterat enligt PySpark output och hämtas genom en fråga mot 5-minutershistogram i TAPIR Core Delta-tabeller. 
 
 ``` 
@@ -141,36 +139,39 @@ Källa ipv6-format: [ ipv6-representation](https://www.networkacademy.io/ccna/ip
 
 Status: Under implementering
 
-IP-adresser krypteras före HLL-beräkning. Detta gör att det inte går att härleda en IP-adress från en HLL-sketch och sketchen är alltså är irreversibel.
-#### Problemet utan kryptering:
-Utan kryptering lämnas spår av IP-adresser i HLL-sketchen som för vissa IP-adresser kan vara igenkännbara. Vissa IP-adresser kan hashas till "många 0:or i mitten". Vilka IP-adresser som får detta kan räknas ut på förhand, givet att man känner till hur HLL:en är uppbyggd. Med rainbow table går det då att återskapa IP-adress. För att göra detta behöver kunskap finnas om konfigurationsparametrar till HLL-strukturen; det går även att göra kvalificerade gissningar.
+IP-adresser krypteras före de adderas till HyperLogLog. Detta gör att det inte skall gå att återskapa en IP-adress från en HLL-sketch  även vid korrelation med relaterade data, och att sketchen är irreversibel.
 
-Simulering och beräkningar av problemet: [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
+#### Problemet utan kryptering:
+Utan kryptering kan man testa med samtliga adresser operatören ansvarar för (de adresser som operatören annonserar ut till Internet i sin publika routing-tabell). Man kan då se vilka register och med vilken rang deras adresser registreras i HLL-sketchen. För många kommer dessa kollidera med andra addresser (samma värde) eller maskeras av andra adresser (lägre värde än en tidigare lagrad adress), så alla adresser kan inte hittas direkt, men genom att korrelera data över olika domäner och över tid kan man med hög sannolikhet koppla en address till en fråga.
+
+Simulering: [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
+Mätvärde: andel IP-adresser i subnätet vars register-avtryck är särskiljbart, före vs efter kryptering.
+
+#### Anteckningar
+För den kryptering av IP-adress som sker före HLL uppmanas Edge-operatörer att använda samma hemlighet på alla EDM-installationer, för att kunna merga HLL-sketcher mellan dessa och uppskatta antalet gemensamma klienter (COUNT DISTINCT). Detta är särskilt viktigt för operatörer som kör anycast.
+
 ### Validering
 
-- Verifiera att kryptering faktiskt sker före HLL-inmatning
-- Verifiera att resultatet är irreversibelt
 #### Verifiera att kryptering faktiskt sker före HLL-inmatning
-1. **Källkodsgranskning i EDM**. Dataflödet från `client_ip` -> HLL-insert. Kontrollera att raw IP aldrig når `hll.add()`.  Kodrad: ... 
-2. **Enhetstest i EDM-repo** (finns?)
-3. Test som verifierar att EDM inte aggregerar om krypteringsnyckeln saknas. (Annars kan en felkonfigurerad Edge tyst publicera oskyddade sketcher.)
+**1. Källkodsgranskning i EDM**.
+    1. I dataflödet från DNSTAP till HLL, kontrollera att `client_ip` aldrig når `hll.add()`.
+    2. Tidigare version av EDM använder CryptoPAn som nyckelstyrd pseudonymisering, IPv4 till permuterad IPv4 och IPv6 till permuterad IPv6. Standard i nätverkssammanhang, men inte särskilt starkt för IPv4 (32 bitar, reversibelt med nyckel)
+    3. Senare versioner av EDM använder AES direkt, baserat på IPv6-normaliserade adresser med trunkerat utdata (64 bitar, irreversibelt, men operatören kan skapa en uppslagstabell (rainbow table) för alla sina adresser baserat på nyckeln)
+**2. Enhetstester i EDM-repo**
+    1. Verifiera att krypteringsalgoritmen skapar deterministiska men linjärt distribuerade, slumpmässiga data (PRNG)
+        - För EDM med CryptoPAn används MurmurHash3 för att skapa detta
+        - För EDM med AES används utdata från AES direkt 
+    3. Om krypteringsnyckeln saknas skall EDM inte aggregera data
 
-#### Verifiera att resultatet är irreversibelt
-**Rainbow-table-simulering med och utan kryptering**. Fortsätt befintligt arbete i becoming-uniquely-identifiable-in-a-hyperloglog-sketch. 
-
-- _Utan kryptering_: enumerera IP-rymd (t.ex. hela /24 eller /16), beräkna HLL-bidrag, mät hur många IP-adresser som ger unika register-signaturer. Detta är baseline-hotet.
-- _Med kryptering (samma seed)_: repetera. Förväntat resultat: 
-
-Mätvärde: andel IP-adresser i subnätet vars register-avtryck är särskiljbart, före vs efter kryptering.
-#### Anteckningar
-Med den kryptering av IP-adress som sker före HLL-beräkning uppmanas Edge-operatörer att använda samma "hemlighet" (seed) på alla Edge hos en operatör, för att kunna merga HLL-sketcher mellan dessa och beräkna antal klienter utan dubbletter.
 
 ## Påstående: Sekund-tidsstämplar existerar inte i TAPIR Core dataset
 
-Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar. Detta gör att en extern logg med sekundupplösning (t.ex. en webbservers `access_log`) inte deterministiskt kan matchas 1-till-1 mot en enskild TAPIR-observation hos en tillräckligt stor operatör. 
+Tidsstämplar i TAPIR Core avrundas eller sammanställs i intervaller om 1 minut. Den enda sekund-tidsstämpeln som existerar är i metadatat Core, vilket visar när minut-intervallet startar. En sekund-tidsstämpel på en DNS-fråga är ett typiskt korrelationsattribut som kan matchas mot t.ex. en webbservers `access_log`. En minut-tidsstämpel delas av alla klienter som ställt frågor på samma domän under samma minut, vilket bryter 1-till-1-relationen. 
 
 **Vidareutveckling för mindre operatörer**
-Skapa en Aggregations-Edge.
+1. Skapa en Aggregations-Edge som blandar trafiken för att öka antalet användare
+2. Slumpmässig nyckel med snabb rotation, vilket offrar möjligheten att så ihop sketchar över längre tid
+3. Enbart en skalär räknare för antal unika användare inom tidsfönstret
 
 ### Motivering: Frånvaro av sekund-tidsstämpel som anonymiseringsmetod
 
@@ -178,19 +179,22 @@ Att TAPIR Core saknar sekundupplösning på tidsstämplar är ett aktivt anonymi
 Det uppfyller GDPR:s tröskel för anonym data (skäl 26: "extremt osannolikt att identifiera"). 
 
 **1. RFC 9076 - DNS Privacy Considerations.**
-Identifierar granulariteten på tidsstämplar och aggregering av trafik som centrala faktorer för om DNS-data kan användas för spårning av enskilda klienter. Aggregerad data med grov tidsupplösning listas som en av de åtgärder som minskar risken. Källa: <https://www.rfc-editor.org/info/rfc9076>
+    - Identifierar granulariteten på tidsstämplar och aggregering av trafik som centrala faktorer för om DNS-data kan användas för spårning av enskilda klienter
+    - Aggregerad data med grov tidsupplösning listas som en av de åtgärder som minskar risken. 
+    - Källa: <https://www.rfc-editor.org/info/rfc9076>
 
 **2. RFC 6973 - Privacy Considerations for Internet Protocols (IAB).**
-Definierar hotmodeller: *korrelation* (kombinera datamängder från olika källor för att härleda information om en individ) och *länkbarhet* (avgöra om två observationer avser samma individ). 
-
-En sekund-tidsstämpel på en DNS-fråga är ett typiskt korrelationsattribut som kan matchas 1-till-1 mot t.ex. en webbservers `access_log`. En minut-tidsstämpel delas av alla klienter som ställt frågor på samma domän under samma minut, vilket bryter den 1-till-1-relationen. Källa: <https://www.rfc-editor.org/info/rfc6973>
+    - Hotmodellen *korrelation* (kombinera datamängder från olika källor för att härleda information om en individ)
+    - Hotmodellen *länkbarhet* (avgöra om två observationer avser samma individ)
+    - Källa: <https://www.rfc-editor.org/info/rfc6973>
 
 **3. k-anonymitet (Sweeney, 2002) - kvantitativ grund.**
-För att en observation ska vara anonym enligt k-anonymitetsmodellen ska varje kombination av kvasi-identifierare, här `<Well Known-domän, minut, creator>`  delas av minst *k* distinkta individer. Om *k* ≥ 2 kan en extern sekundupplöst logg inte deterministiskt länkas till en enskild TAPIR-observation; ju högre *k*, desto lägre sannolikhet för korrekt länkning. 
-
-Källa: L. Sweeney, *k-anonymity: A model for protecting privacy*, International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, 10(5), 2002.
-
-**4. Mätning på TAPIR Core operatörsdata**
+    - För att en observation ska vara anonym enligt k-anonymitetsmodellen ska varje kombination av kvasi-identifierare, här `<Well Known-domän, minut, creator>`  delas av minst *k* distinkta individer
+    - Om *k* ≥ 2 kan en extern sekundupplöst logg inte deterministiskt länkas till en enskild TAPIR-observation
+    - Ju högre *k*, desto lägre sannolikhet för korrekt länkning
+    - Källa: L. Sweeney, *k-anonymity: A model for protecting privacy*, International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, 10(5), 2002.
+    
+### Mätning på TAPIR Core operatörsdata
 Uppmät *k* för befintliga TAPIR-Edge-installationer. Förslag:
 
 - För varje `<Well Known-domän, minut, creator>`-histogram i ett representativt urval: rapportera fördelningen av uppskattat antal distinkta klienter, k. andel histogram med k < 5, k<10, mm
@@ -215,7 +219,7 @@ Todo: Distinct. Se flera minuter + creator.
 
 Tidsstämpeln som syns i 1-minutersaggregat är när aggregatet publicerades till TAPIR Core. Samma minut - samma Edge. (förslag: EDM forcerar tidsstämpeln till `YYYY-MM-DD-HH-MM` för enhetlighet, vill vi det?)
 
-Tidsstämplar skickas binärkodade enligt parquet-tidsstämpelformat.
+Tidsstämplar skickas binärkodade enligt parquet-tidsstämpelformat med sekund satt till 0.
 
 ![img7](img/7.png)
 
