@@ -4,6 +4,7 @@
 
 ## Bakgrund
 
+- DNS TAPIR ska efterleva GDPR men har även egna högre ställda krav för att säkerställa integriteten i datat. Vissa åtgärder görs utöver GDPR-efterlevnad.
 - GDPR kräver inte att det ska vara absolut omöjligt att kunna identifiera en individ, men möjligheten till identifiering behöver vara extremt osannolik för att datan ska klassas som anonym.
 - Anonymiserade uppgifter anses inte längre vara personuppgifter och faller därmed utanför GDPR:s tillämpningsområde.
 - Anonymiseringen ska vara irreversibel.
@@ -11,13 +12,26 @@
 - Personuppgifter inkluderar allt som kan identifiera en enskild individ. Utöver namn och ID-uppgifter inkluderas även kvasi-identifierare såsom IP-adresser, transaktionsmönster och enhetsavtryck. [GDPR Artikel 4](https://gdpr-info.eu/art-4-gdpr/)
 (Källla: EU:s dataskyddsförordning)
 
+DNS TAPIR analyserar DNS-uppslag (DNS-frågor) utan att analysera personlig information. Ett DNS-uppslag sker varje gång någon (eller deras enhet) besöker en webbplats, skickar ett mejl eller öppnar en app.
+
 DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
+
+## Mål
+
+- Ha bekräftat att det är mycket osannolikt att identifiera enskilda individer i datasetet
+- Ha bekräftat att all insamlade data anonymiseras innan den överförs till mottagaren DNS TAPIR i Core samt att eventuella risker för återidentifiering är hanterade på ett tillfredsställande sätt.
 
 ### TAPIR Core Dataset
 
-Datasetet i TAPIR Core består av 1-minuters-aggregat/räknare av DNS-uppslag för välkända domäner (Well Known Domains). Dessa aggregat, histogram, innehåller data för hur ett domännamn på en resolver (TAPIR Edge) användes under tidsfönstret. Hur populär domänen var: antal uppslag (antal frågor), en uppskattning av hur många olika användare som slog upp det (antal klienter) och om uppslagen fungerade normalt eller misslyckades.
+Datasetet i TAPIR Core består av 1-minuters-aggregat/räknare av DNS-uppslag för välkända domäner (Well Known Domains). Dessa aggregat, histogram, innehåller data för hur ett domännamn på en resolver (TAPIR Edge) användes under tidsfönstret:
 
-Ett DNS-uppslag sker varje gång någon (eller deras enhet) besöker en webbplats, skickar ett mejl eller öppnar en app.
+- Hur populär domänen var:  antal frågor
+- En uppskattning av hur många olika användare som slog upp det (antal klienter)
+- Om uppslagen fungerade normalt eller misslyckades.
+
+Exempel på hur 1-minutersaggregaten ser ut som lämnar resolvern, TAPIR Edge:
+
+https://dnstapir.github.io/tapir-sample-viewer/
 
 ### HyperLogLog
 
@@ -29,9 +43,11 @@ Fullständig beskrivning av hur datasetet hanteras finns här: [https://www.dnst
 
 När ett dataset med DNS-frågor delas finns en risk att en individs surfbeteende kan identifieras genom frågesekvenser. En konsekvens av det skulle vara att en aktör kan få kännedom om personliga eller organisatoriska intressen och relationer som inte är avsett för publicitet. Sådan kännedom kan användas för att skada individer eller organisationer.
 
-Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet. 
+Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till extrem osannolikhet.
 
-###  Personer vars data kan beröras
+Kommentar: Huruvuda detta också är ett GDPR-krav är inte bekräftat.
+
+### Personer vars data kan beröras
 
 - Klienter (Internetanvändare) som använder TAPIR-ansluten DNS-resolver hos Internetoperatör. Dessa klienters DNS-frågor i nästan realtid.
 
@@ -39,7 +55,9 @@ Dataarkitekturen i DNS TAPIR är framtagen för att minimera dessa risker till e
 
 Målet med denna revision är att analytiker från tredje part, utanför DNS TAPIR projektorganisation, ska kunna ta del av datasetet för analys
 
-#### Några åtgärder:
+#### Några åtgärder
+
+Kommentar: Vilka åtgärder som är nödvändiga enligt GDPR, och vilka åtgärder som är tillägg utifrån DNS TAPIR-projektets egna krav, är under utredning.
 
 - Uppskattning av antal unika domän-förfrågningar görs med anonymiseringsalgoritmen HyperLogLog (HLL) utan att lagra IP-adresser
 - Kryptering av IP-adresser innan beräkning med HLL
@@ -89,15 +107,19 @@ För att genomföra granskning behövs antingen åtkomst till TAPIR Core datakä
 #### Testa för återidentifiering
 
 - Beräkna sannolikheten för risk att återidentifera en IP-adress från HLL-sketch. [/becoming-uniquely-identifiable-in-a-hyperloglog-sketch](/becoming-uniquely-identifiable-in-a-hyperloglog-sketch)
-- Eventuellt: Utifrån en HLL-sketch samt ett känt subnät, försök återidentifiera en IP-adress. Simulering och beräkningar av problemet:
+- Eventuellt: Utifrån en HLL-sketch samt ett känt subnät, försök återidentifiera en IP-adress. Kommentar: Nödvändigt?
 
 #### Sök efter sekundtids-stämpel i domänförfrågningar
+
+_Kommentar: GDPR-krav eller TAPIR-krav?_
 
 Genom att inte inkludera finkorninga tidsangivelser minskar möjligheten att identifiera avtryck från individ... [beskriv närmare]. TAPIR Core aggregat innehåller endast minutangivelser.
 
 - Sök efter sekundtidsstämpel i aggregat
 
 #### Sök efter ovanliga domännamn
+
+_Kommentar: GDPR-krav eller TAPIR-krav?_
 
 Genom att endast inkludera välkända domäner i Core dataset så minskar risken för att kunna indentifiera avtryck från individ. Forskning som analyserar fingerprints i DNS, använder
 framförallt hela frågesekvenser för identifiering (källa..). TAPIR Core exkluderar ovanliga domännamn.
@@ -109,20 +131,24 @@ Exempel på observation av eventet ny domän:
 
 ![img43](img/img36.png)
 
-#### Events?
-....
+#### Sök efter identifierare i events
+Behövs ett test, eller räcker exempel från events data?
 
 #### Testa för att hitta frågemönster
 
-- ....
+_Kommentar: Sannolikt TAPIR-krav, inte GDPR?_
+
+[privacyvalidering-querypatterns.md](privacyvalidering-querypatterns.md)
 
 #### Automatisering av valideringstest
 
-- När DataLoad exekveras (sammanställning av 1-minutersaggregat till 5-minutersaggregat), exekvera grundläggande test av innehållet i aggregaten, på ett urval. Grundläggande test: Sök efter IP-adress och sekundstämplar.
+- Förslag: När DataLoad exekveras (sammanställning av 1-minutersaggregat till 5-minutersaggregat), exekvera grundläggande test av innehållet i aggregaten, på ett urval. Grundläggande test: Sök efter IP-adress och sekundstämplar.
 
 #### Manuell validering
 
-- Undersök Well Known-fil
+_Kommentar: Nödvändigt enligt GDPR?_
+
+- Undersök Well Known-fil efter identifierbara domäner. 
 - Membership Inference Attack. Önskvärt, kostsamt och tidskrävande. Sannolikt inte nödvändigt för GDPR-efterlevnad utan enbart för DNS TAPIR utökade integritetsmål.
 
 #### Loggning av resultat
