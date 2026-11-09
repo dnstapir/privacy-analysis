@@ -16,6 +16,11 @@ DNS TAPIR analyserar DNS-uppslag (DNS-frågor) utan att analysera personlig info
 
 DNS TAPIR anonymiserar data redan på DNS-operatörsnivå. DNS TAPIR behandlar inte några personuppgifter, utan får tillgång till anonymiserade datapaket. I DNS TAPIR-projektet genomförs anonymiseringen genom en kombination av sekvensbrytning, anonymiseringstekniker och successiv aggregering.
 
+## Mål
+
+- Ha bekräftat att det är mycket osannolikt att identifiera enskilda individer i datasetet
+- Ha bekräftat att all insamlade data anonymiseras innan den överförs till mottagaren DNS TAPIR i Core samt att eventuella risker för återidentifiering är hanterade på ett tillfredsställande sätt.
+
 ### TAPIR Core Dataset
 
 Datasetet i TAPIR Core består av 1-minuters-aggregat/räknare av DNS-uppslag för välkända domäner (Well Known Domains). Dessa aggregat, histogram, innehåller data för hur ett domännamn på en resolver (TAPIR Edge) användes under tidsfönstret:
