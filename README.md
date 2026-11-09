@@ -126,7 +126,7 @@ Exempel på observation av eventet ny domän:
 
 ![img43](img/img36.png)
 
-#### Sök efter identifierare i events?
+#### Sök efter identifierare i events
 Behövs ett test, eller räcker exempel från events data?
 
 #### Testa för att hitta frågemönster
